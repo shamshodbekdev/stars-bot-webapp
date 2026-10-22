@@ -1,4 +1,4 @@
-import { Home, Star, Crown, Phone, User } from 'lucide-react';
+import { Home, Star, Crown, Gift, User } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../utils/cn';
@@ -12,7 +12,7 @@ export default function BottomNav() {
     { path: '/', icon: Home, label: t('nav.home') },
     { path: '/stars', icon: Star, label: t('nav.stars') },
     { path: '/premium', icon: Crown, label: t('nav.premium') },
-    { path: '/numbers', icon: Phone, label: t('nav.numbers') },
+    { path: '/gift', icon: Gift, label: t('nav.gift') },     // ← Nomer o'rniga Gift
     { path: '/profile', icon: User, label: t('nav.profile') },
   ];
 

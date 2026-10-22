@@ -4,47 +4,39 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Page from '../components/layout/Page';
 import { formatSom } from '../utils/format';
-import { Star, Crown, Phone, Gift, TrendingUp, ChevronRight, Wallet } from 'lucide-react';
+import { Star, Crown, Gift, TrendingUp, ChevronRight, Wallet } from 'lucide-react';
 
 export default function Home() {
   const { user } = useTelegram();
   const { t } = useLanguage();
   const navigate = useNavigate();
 
-  const services = [
-    { 
-      path: '/stars', 
-      icon: Star, 
-      title: t('home.stars'), 
-      desc: t('home.stars_desc'),
-      color: 'text-amber-500',
-      bg: 'bg-amber-50 dark:bg-amber-500/10'
-    },
-    { 
-      path: '/premium', 
-      icon: Crown, 
-      title: t('home.premium'), 
-      desc: t('home.premium_desc'),
-      color: 'text-violet-500',
-      bg: 'bg-violet-50 dark:bg-violet-500/10'
-    },
-    { 
-      path: '/numbers', 
-      icon: Phone, 
-      title: t('home.numbers'), 
-      desc: t('home.numbers_desc'),
-      color: 'text-cyan-500',
-      bg: 'bg-cyan-50 dark:bg-cyan-500/10'
-    },
-    { 
-      path: '/gift', 
-      icon: Gift, 
-      title: t('home.gift'), 
-      desc: t('home.gift_desc'),
-      color: 'text-rose-500',
-      bg: 'bg-rose-50 dark:bg-rose-500/10'
-    },
-  ];
+const services = [
+  {
+    path: '/premium',
+    icon: Crown,
+    title: t('home.premium'),
+    desc: t('home.premium_desc'),
+    color: 'text-violet-500',
+    bg: 'bg-violet-50 dark:bg-violet-500/10'
+  },
+  {
+    path: '/stars',
+    icon: Star,
+    title: t('home.stars'),
+    desc: t('home.stars_desc'),
+    color: 'text-amber-500',
+    bg: 'bg-amber-50 dark:bg-amber-500/10'
+  },
+  {
+    path: '/gift',
+    icon: Gift,
+    title: t('home.gift'),
+    desc: t('home.gift_desc'),
+    color: 'text-rose-500',
+    bg: 'bg-rose-50 dark:bg-rose-500/10'
+  },
+];
 
   return (
     <Page>
@@ -65,7 +57,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Balans — qora/kulrang */}
+      {/* Balans */}
       <div className="px-4 mb-6">
         <div className="bg-gray-900 dark:bg-white rounded-2xl p-5 text-white dark:text-gray-900">
           <div className="flex items-center justify-between mb-3">
@@ -84,7 +76,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Xizmatlar — har xil ranglar */}
+      {/* Xizmatlar */}
       <div className="px-4 mb-6">
         <h2 className="text-xs font-bold text-tg-hint mb-3 uppercase tracking-wider">
           {t('home.services')}
@@ -116,7 +108,7 @@ export default function Home() {
       {/* Statistika */}
       <div className="px-4">
         <div className="bg-tg-secondaryBg rounded-2xl border border-tg-hint/5">
-          <button 
+          <button
             onClick={() => navigate('/profile')}
             className="w-full flex items-center justify-between p-4 border-b border-tg-hint/10"
           >

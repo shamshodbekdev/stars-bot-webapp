@@ -30,7 +30,7 @@
     "home": "Асосий",
     "stars": "Stars",
     "premium": "Premium",
-    "numbers": "Номер",
+    "gift": "Gift",
     "profile": "Профил"
   },
   "stars_page": {
@@ -50,26 +50,25 @@
     "step2": "Миқдор",
     "step3": "Тасдиқлаш"
   },
-  "premium_page": {
-    "title": "Premium сотиб олиш",
-    "username": "Premium совға қилиш учун username",
-    "username_placeholder": "Бўш қолдирсангиз — ўзингизга",
-    "months": "Муддат",
-    "month": "ой",
-    "price": "Нарх",
-    "balance": "Баланс",
-    "confirm": "Тасдиқлаш",
-    "confirm_title": "Буюртмани тасдиқлаш"
-  },
-  "numbers_page": {
-    "title": "Номер олиш",
-    "search": "Давлат қидириш",
-    "confirm": "Сотиб олиш",
-    "not_found": "Ҳеч нарса топилмади",
-    "price": "Нарх",
-    "balance": "Баланс",
-    "buy": "Сотиб олиш"
-  },
+"premium_page": {
+  "title": "Premium сотиб олиш",
+  "username": "Premium совға қилиш учун username",
+  "username_placeholder": "Бўш қолдирсангиз — ўзингизга",
+  "username_hint": "Бўш қолдирсангиз — ўзингизга юборилади",
+  "months": "Муддат",
+  "month": "ой",
+  "price": "Нарх",
+  "balance": "Баланс",
+  "confirm": "Тасдиқлаш",
+  "confirm_title": "Буюртмани тасдиқлаш",
+  "hero_subtitle": "Premium имкониятларни очинг",
+  "selected": "Танланган",
+  "receiver": "Қабул қилувчи",
+  "myself": "Ўзим",
+  "step1": "Қабул қилувчи",
+  "step2": "Муддат",
+  "step3": "Тасдиқлаш"
+},
   "gift_page": {
     "title": "Gift Market",
     "coming_soon": "Тез орада...",

@@ -30,7 +30,7 @@
     "home": "Asosiy",
     "stars": "Stars",
     "premium": "Premium",
-    "numbers": "Nomer",
+    "gift": "Gift",
     "profile": "Profil"
   },
   "stars_page": {
@@ -50,26 +50,25 @@
     "step2": "Miqdor",
     "step3": "Tasdiqlash"
   },
-  "premium_page": {
-    "title": "Premium sotib olish",
-    "username": "Premium sovg'a qilish uchun username",
-    "username_placeholder": "Bo'sh qoldirsangiz — o'zingizga",
-    "months": "Muddat",
-    "month": "oy",
-    "price": "Narx",
-    "balance": "Balans",
-    "confirm": "Tasdiqlash",
-    "confirm_title": "Buyurtmani tasdiqlash"
-  },
-  "numbers_page": {
-    "title": "Nomer olish",
-    "search": "Davlat qidirish",
-    "confirm": "Sotib olish",
-    "not_found": "Hech narsa topilmadi",
-    "price": "Narx",
-    "balance": "Balans",
-    "buy": "Sotib olish"
-  },
+"premium_page": {
+  "title": "Premium sotib olish",
+  "username": "Premium sovg'a qilish uchun username",
+  "username_placeholder": "Bo'sh qoldirsangiz — o'zingizga",
+  "username_hint": "Bo'sh qoldirsangiz — o'zingizga yuboriladi",
+  "months": "Muddat",
+  "month": "oy",
+  "price": "Narx",
+  "balance": "Balans",
+  "confirm": "Tasdiqlash",
+  "confirm_title": "Buyurtmani tasdiqlash",
+  "hero_subtitle": "Premium imkoniyatlarni oching",
+  "selected": "Tanlangan",
+  "receiver": "Qabul qiluvchi",
+  "myself": "O'zim",
+  "step1": "Qabul qiluvchi",
+  "step2": "Muddat",
+  "step3": "Tasdiqlash"
+},
   "gift_page": {
     "title": "Gift Market",
     "coming_soon": "Tez orada...",

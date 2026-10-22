@@ -30,7 +30,7 @@
     "home": "Главная",
     "stars": "Stars",
     "premium": "Premium",
-    "numbers": "Номер",
+    "gift": "Gift",
     "profile": "Профиль"
   },
   "stars_page": {
@@ -50,26 +50,25 @@
     "step2": "Количество",
     "step3": "Подтверждение"
   },
-  "premium_page": {
-    "title": "Купить Premium",
-    "username": "Username для подарка Premium",
-    "username_placeholder": "Оставьте пустым — для себя",
-    "months": "Срок",
-    "month": "мес",
-    "price": "Цена",
-    "balance": "Баланс",
-    "confirm": "Подтвердить",
-    "confirm_title": "Подтверждение заказа"
-  },
-  "numbers_page": {
-    "title": "Получить номер",
-    "search": "Поиск страны",
-    "confirm": "Купить",
-    "not_found": "Ничего не найдено",
-    "price": "Цена",
-    "balance": "Баланс",
-    "buy": "Купить"
-  },
+"premium_page": {
+  "title": "Купить Premium",
+  "username": "Username для подарка Premium",
+  "username_placeholder": "Оставьте пустым — для себя",
+  "username_hint": "Оставьте пустым — отправится вам",
+  "months": "Срок",
+  "month": "мес",
+  "price": "Цена",
+  "balance": "Баланс",
+  "confirm": "Подтвердить",
+  "confirm_title": "Подтверждение заказа",
+  "hero_subtitle": "Откройте возможности Premium",
+  "selected": "Выбрано",
+  "receiver": "Получатель",
+  "myself": "Себе",
+  "step1": "Получатель",
+  "step2": "Срок",
+  "step3": "Подтверждение"
+},
   "gift_page": {
     "title": "Gift Market",
     "coming_soon": "Скоро...",
