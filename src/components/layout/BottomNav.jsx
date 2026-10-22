@@ -1,22 +1,24 @@
-import { Home, Star, Crown, Phone, Gift, User } from 'lucide-react';
+import { Home, Star, Crown, Phone, User } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
-
-const items = [
-  { path: '/', icon: Home, label: 'Asosiy' },
-  { path: '/stars', icon: Star, label: 'Stars' },
-  { path: '/premium', icon: Crown, label: 'Premium' },
-  { path: '/numbers', icon: Phone, label: 'Nomer' },
-  { path: '/profile', icon: User, label: 'Profil' },
-];
+import { useLanguage } from '../../contexts/LanguageContext';
+import { cn } from '../../utils/cn';
 
 export default function BottomNav() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { t } = useLanguage();
+
+  const items = [
+    { path: '/', icon: Home, label: t('nav.home') },
+    { path: '/stars', icon: Star, label: t('nav.stars') },
+    { path: '/premium', icon: Crown, label: t('nav.premium') },
+    { path: '/numbers', icon: Phone, label: t('nav.numbers') },
+    { path: '/profile', icon: User, label: t('nav.profile') },
+  ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-tg-bg/95 backdrop-blur-lg border-t border-tg-hint/10">
-      <div className="flex justify-around py-2">
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-tg-secondaryBg border-t border-tg-hint/10">
+      <div className="flex justify-around py-2 max-w-md mx-auto">
         {items.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.path;
@@ -26,20 +28,19 @@ export default function BottomNav() {
               onClick={() => navigate(item.path)}
               className="relative flex flex-col items-center gap-1 px-3 py-1"
             >
-              {isActive && (
-                <motion.div
-                  layoutId="activeTab"
-                  className="absolute inset-0 bg-primary-500/10 rounded-xl"
-                />
-              )}
               <Icon
                 size={22}
-                className={isActive ? 'text-primary-500' : 'text-tg-hint'}
+                className={cn(
+                  'transition-colors',
+                  isActive ? 'text-tg-text' : 'text-tg-hint'
+                )}
+                strokeWidth={isActive ? 2.5 : 1.8}
               />
               <span
-                className={`text-[10px] font-medium ${
-                  isActive ? 'text-primary-500' : 'text-tg-hint'
-                }`}
+                className={cn(
+                  'text-[10px]',
+                  isActive ? 'font-bold text-tg-text' : 'font-medium text-tg-hint'
+                )}
               >
                 {item.label}
               </span>
