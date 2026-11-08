@@ -1,95 +1,107 @@
+/**
+ * Profile (accent: blue): identity, stats and shortcuts.
+ */
 import { useNavigate } from 'react-router-dom';
-import { useTelegram } from '../hooks/useTelegram';
+import { Copy, LifeBuoy, ListOrdered, Settings, Star, Users, Wallet } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
-import Page from '../components/layout/Page';
+import { useUser } from '../contexts/UserContext';
+import { useToast } from '../components/ui/Toast';
+import Page, { Section } from '../components/layout/Page';
 import Header from '../components/layout/Header';
-import {
-  ChevronRight, Settings, Wallet, Star, Gift, TrendingUp
-} from 'lucide-react';
-import { formatSom } from '../utils/format';
+import Avatar from '../components/ui/Avatar';
+import { Skeleton } from '../components/ui/Skeleton';
+import { ListGroup, ListItem } from '../components/ui/List';
+import { copyToClipboard } from '../utils/clipboard';
+import { formatNumber, formatSom } from '../utils/format';
+import { openTelegramLink } from '../lib/telegram';
+import { LINKS } from '../config';
 
 export default function Profile() {
-  const { user } = useTelegram();
   const { t } = useLanguage();
+  const { user, profile, loading } = useUser();
+  const { showToast } = useToast();
   const navigate = useNavigate();
+
+  const fullName = [user?.first_name, user?.last_name].filter(Boolean).join(' ') || t('common.guest');
+
+  const copyId = async () => {
+    if (!user?.id) return;
+    const ok = await copyToClipboard(String(user.id));
+    showToast(ok ? t('profile.id_copied') : t('balance_page.copy_error'), ok ? 'success' : 'error');
+  };
+
+  const stats = [
+    { icon: Wallet, label: t('stats.balance'), value: formatSom(profile?.balance ?? 0, t('common.som')) },
+    { icon: ListOrdered, label: t('stats.orders'), value: formatNumber(profile?.orders ?? 0) },
+    { icon: Star, label: t('stats.stars'), value: formatNumber(profile?.stars ?? 0) },
+    { icon: Users, label: t('stats.referrals'), value: formatNumber(profile?.referrals ?? 0) },
+  ];
 
   return (
     <Page>
-      <Header title={t('profile.title')} showBack />
+      <Header title={t('profile.title')} />
 
-      <div className="px-4 py-4">
-        <div className="bg-tg-secondaryBg rounded-2xl p-4 border border-tg-hint/5">
-          <div className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 dark:from-gray-200 dark:to-gray-400 flex items-center justify-center text-white dark:text-gray-900 text-xl font-bold">
-              {user?.first_name?.[0] || 'S'}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-bold text-lg truncate">
-                {user?.first_name} {user?.last_name}
-              </p>
-              <p className="text-sm text-tg-hint truncate">
-                @{user?.username || 'username'}
-              </p>
-              <p className="text-xs text-tg-hint mt-0.5">
-                {t('profile.id')}: {user?.id}
-              </p>
-            </div>
+      <Section>
+        {/* Identity */}
+        <div className="flex items-center gap-4 rounded-2xl border border-line bg-surface p-4">
+          <Avatar user={user} size={56} />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-lg font-semibold">{fullName}</p>
+            <p className="truncate text-sm text-muted">
+              {user?.username ? `@${user.username}` : t('recipient.no_username')}
+            </p>
+            {user?.id && (
+              <button
+                type="button"
+                onClick={copyId}
+                className="mt-1 inline-flex items-center gap-1 text-xs text-blue-500"
+              >
+                ID: {user.id}
+                <Copy size={12} />
+              </button>
+            )}
           </div>
         </div>
-      </div>
 
-      <div className="px-4 mb-4 grid grid-cols-2 gap-3">
-        {[
-          { icon: Wallet, label: t('profile.balance'), value: formatSom(0) },
-          { icon: Star, label: t('profile.stars'), value: '0' },
-          { icon: Gift, label: t('profile.referrals'), value: '0' },
-          { icon: TrendingUp, label: t('profile.orders'), value: '0' },
-        ].map((item, i) => {
-          const Icon = item.icon;
-          return (
-            <div key={i} className="bg-tg-secondaryBg rounded-2xl p-4 border border-tg-hint/5">
-              <Icon size={18} className="text-tg-hint mb-2" />
-              <p className="text-xs text-tg-hint">{item.label}</p>
-              <p className="font-semibold mt-0.5">{item.value}</p>
+        {/* Stats */}
+        <div className="grid grid-cols-2 gap-3">
+          {stats.map(({ icon: Icon, label, value }) => (
+            <div key={label} className="rounded-2xl border border-line bg-surface p-4">
+              <Icon size={18} className="mb-3 text-blue-500" />
+              <p className="text-xs text-muted">{label}</p>
+              {loading ? (
+                <Skeleton className="mt-1.5 h-5 w-20" />
+              ) : (
+                <p className="mt-0.5 truncate font-semibold">{value}</p>
+              )}
             </div>
-          );
-        })}
-      </div>
-
-      <div className="px-4">
-        <h2 className="text-xs font-bold text-tg-hint mb-2 uppercase tracking-wider">
-          {t('profile.manage')}
-        </h2>
-        <div className="bg-tg-secondaryBg rounded-2xl border border-tg-hint/5 overflow-hidden">
-          <button
-            onClick={() => navigate('/settings')}
-            className="w-full flex items-center gap-3 px-4 py-4 border-b border-tg-hint/10 active:bg-tg-hint/5 transition-colors"
-          >
-            <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center">
-              <Settings size={18} className="text-blue-500" />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-sm font-semibold">{t('profile.settings')}</p>
-              <p className="text-xs text-tg-hint mt-0.5">{t('profile.settings_hint')}</p>
-            </div>
-            <ChevronRight size={18} className="text-tg-hint" />
-          </button>
-
-          <button
-            onClick={() => navigate('/balance')}
-            className="w-full flex items-center gap-3 px-4 py-4 active:bg-tg-hint/5 transition-colors"
-          >
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-              <Wallet size={18} className="text-emerald-500" />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-sm font-semibold">{t('profile.deposit')}</p>
-              <p className="text-xs text-tg-hint mt-0.5">{t('profile.deposit_hint')}</p>
-            </div>
-            <ChevronRight size={18} className="text-tg-hint" />
-          </button>
+          ))}
         </div>
-      </div>
+
+        <ListGroup title={t('profile.manage')}>
+          <ListItem
+            icon={Wallet}
+            iconClassName="text-blue-500"
+            title={t('profile.deposit')}
+            subtitle={t('profile.deposit_hint')}
+            onClick={() => navigate('/balance')}
+          />
+          <ListItem
+            icon={Settings}
+            iconClassName="text-blue-500"
+            title={t('profile.settings')}
+            subtitle={t('profile.settings_hint')}
+            onClick={() => navigate('/settings')}
+          />
+          <ListItem
+            icon={LifeBuoy}
+            iconClassName="text-blue-500"
+            title={t('settings.support_chat')}
+            subtitle={t('settings.support_chat_hint')}
+            onClick={() => openTelegramLink(LINKS.supportChat)}
+          />
+        </ListGroup>
+      </Section>
     </Page>
   );
 }

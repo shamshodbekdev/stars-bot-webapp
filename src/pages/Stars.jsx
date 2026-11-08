@@ -1,175 +1,201 @@
+/**
+ * Stars purchase wizard (accent: amber).
+ * 1. Recipient  2. Amount  3. Confirm
+ */
 import { useState } from 'react';
+import { Star } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { useToast } from '../components/ui/Toast';
-import Page from '../components/layout/Page';
+import { useRecipient } from '../hooks/useRecipient';
+import { usePurchase } from '../hooks/usePurchase';
+import Page, { Section } from '../components/layout/Page';
 import Header from '../components/layout/Header';
 import Button from '../components/ui/Button';
-import { Star, User, Check } from 'lucide-react';
-import { formatSom } from '../utils/format';
+import Input from '../components/ui/Input';
+import StepIndicator from '../components/ui/StepIndicator';
+import StepTransition from '../components/ui/StepTransition';
+import RecipientField from '../components/order/RecipientField';
+import { Summary, SummaryRow } from '../components/order/Summary';
+import BalanceRow from '../components/order/BalanceRow';
+import { STARS } from '../config';
+import { cn } from '../utils/cn';
+import { digitsOnly, formatNumber, formatSom } from '../utils/format';
+import { haptic } from '../lib/telegram';
 
 export default function Stars() {
   const { t } = useLanguage();
-  const { showToast } = useToast();
-  const [username, setUsername] = useState('');
-  const [quantity, setQuantity] = useState(50);
+  const { recipient, setRecipient, error: recipientError, validate, reset, display } = useRecipient();
+  const { purchase, loading } = usePurchase();
+
   const [step, setStep] = useState(1);
+  const [username, setUsername] = useState('');
+  const [amount, setAmount] = useState(String(STARS.presets[1]));
+  const [amountError, setAmountError] = useState('');
 
-  const amounts = [50, 100, 250, 500, 1000, 2500];
-  const pricePerStar = 90;
-  const totalPrice = quantity * pricePerStar;
+  const quantity = Number(amount) || 0;
+  const total = quantity * STARS.pricePerStar;
+  const som = t('common.som');
 
-  const handleConfirm = () => {
-    showToast(t('toast.order_created'), 'success');
-    setTimeout(() => setStep(1), 1500);
+  // Step 1 -> 2
+  const handleRecipientNext = () => {
+    const name = validate();
+    if (!name) return haptic.notify('error');
+    setUsername(name);
+    setStep(2);
+  };
+
+  // Step 2 -> 3
+  const handleAmountNext = () => {
+    let msg = '';
+    if (!amount) msg = t('validation.amount_required');
+    else if (quantity < STARS.min) msg = t('validation.stars_min', { min: STARS.min });
+    else if (quantity > STARS.max) msg = t('validation.stars_max', { max: formatNumber(STARS.max) });
+    setAmountError(msg);
+    if (msg) return haptic.notify('error');
+    setStep(3);
+  };
+
+  const handleConfirm = async () => {
+    const ok = await purchase({ type: 'stars', username, quantity, price: total });
+    if (ok) {
+      reset();
+      setAmount(String(STARS.presets[1]));
+      setStep(1);
+    }
   };
 
   return (
     <Page>
-      <Header title={t('stars_page.title')} showBack />
+      <Header title={t('stars_page.title')} />
+      <StepIndicator
+        step={step}
+        onStepClick={setStep}
+        labels={[t('steps.recipient'), t('steps.amount'), t('steps.confirm')]}
+      />
 
-      {/* Progress indicator */}
-      <div className="px-4 py-4">
-        <div className="flex items-center justify-between">
-          {[1, 2, 3].map((s) => (
-            <div key={s} className="flex items-center flex-1">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                  step >= s
-                    ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
-                    : 'bg-tg-secondaryBg text-tg-hint'
-                }`}
-              >
-                {step > s ? <Check size={14} /> : s}
+      <Section>
+        <StepTransition step={step}>
+          {/* ---------- Step 1: recipient ---------- */}
+          {step === 1 && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="grid h-11 w-11 place-items-center rounded-xl bg-amber-500/10">
+                  <Star size={22} className="fill-amber-500 text-amber-500" />
+                </span>
+                <div>
+                  <h2 className="font-semibold">{t('stars_page.hero_title')}</h2>
+                  <p className="text-sm text-muted">{t('stars_page.hero_subtitle')}</p>
+                </div>
               </div>
-              {s < 3 && (
-                <div
-                  className={`flex-1 h-0.5 mx-2 transition-colors ${
-                    step > s ? 'bg-gray-900 dark:bg-white' : 'bg-tg-hint/20'
-                  }`}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-        <p className="text-xs text-tg-hint text-center mt-2">
-          {step === 1 && t('stars_page.step1')}
-          {step === 2 && t('stars_page.step2')}
-          {step === 3 && t('stars_page.step3')}
-        </p>
-      </div>
-
-      <div className="p-4">
-        {/* Step 1: Username */}
-        {step === 1 && (
-          <div className="space-y-4 animate-[fadeIn_0.3s_ease-out]">
-            <div className="bg-tg-secondaryBg rounded-2xl p-4 border border-tg-hint/5">
-              <label className="text-sm font-semibold block mb-3">
-                {t('stars_page.username')}
-              </label>
-              <div className="flex items-center gap-2 bg-tg-bg rounded-xl px-3 py-3">
-                <User size={18} className="text-tg-hint" />
-                <input
-                  type="text"
-                  placeholder={t('stars_page.username_placeholder')}
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="bg-transparent outline-none flex-1 text-sm"
-                />
-              </div>
-              <p className="text-xs text-tg-hint mt-2">
-                {t('stars_page.username_hint')}
-              </p>
-            </div>
-            <Button fullWidth size="lg" onClick={() => setStep(2)}>
-              {t('common.next')}
-            </Button>
-          </div>
-        )}
-
-        {/* Step 2: Amount */}
-        {step === 2 && (
-          <div className="space-y-4 animate-[fadeIn_0.3s_ease-out]">
-            <div className="bg-tg-secondaryBg rounded-2xl p-4 border border-tg-hint/5">
-              <label className="text-sm font-semibold block mb-3">
-                {t('stars_page.amount')}
-              </label>
-              <div className="grid grid-cols-3 gap-2 mb-3">
-                {amounts.map((a) => (
-                  <button
-                    key={a}
-                    onClick={() => setQuantity(a)}
-                    className={`py-3 rounded-xl font-semibold text-sm transition-all ${
-                      quantity === a
-                        ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
-                        : 'bg-tg-bg text-tg-text hover:bg-tg-hint/10'
-                    }`}
-                  >
-                    {a}
-                  </button>
-                ))}
-              </div>
-              <div className="flex items-center gap-2 bg-tg-bg rounded-xl px-3 py-3">
-                <Star size={18} className="text-amber-500" />
-                <input
-                  type="number"
-                  value={quantity}
-                  onChange={(e) => setQuantity(Number(e.target.value))}
-                  className="bg-transparent outline-none flex-1 text-sm font-semibold"
-                  min={50}
-                />
-                <span className="text-xs text-tg-hint">{t('stars_page.stars')}</span>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <Button variant="secondary" onClick={() => setStep(1)} className="flex-1">
-                {t('common.back')}
-              </Button>
-              <Button onClick={() => setStep(3)} className="flex-1">
+              <RecipientField
+                layoutId="stars-recipient"
+                value={recipient}
+                onChange={setRecipient}
+                error={recipientError}
+              />
+              <Button fullWidth size="lg" onClick={handleRecipientNext}>
                 {t('common.next')}
               </Button>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Step 3: Confirm */}
-        {step === 3 && (
-          <div className="space-y-4 animate-[fadeIn_0.3s_ease-out]">
-            <div className="bg-tg-secondaryBg rounded-2xl p-4 border border-tg-hint/5">
-              <h3 className="font-bold mb-4">{t('stars_page.confirm_title')}</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-tg-hint">{t('stars_page.receiver')}</span>
-                  <span className="font-semibold">
-                    {username ? `@${username}` : t('stars_page.myself')}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-tg-hint">{t('stars_page.amount')}</span>
-                  <span className="font-semibold">{quantity} {t('stars_page.stars')}</span>
-                </div>
-                <div className="flex justify-between text-sm pt-3 border-t border-tg-hint/10">
-                  <span className="text-tg-hint">{t('stars_page.price')}</span>
-                  <span className="font-bold">{formatSom(totalPrice)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-tg-hint">{t('stars_page.balance')}</span>
-                  <span className="font-semibold">0 {t('common.som')}</span>
-                </div>
+          {/* ---------- Step 2: amount ---------- */}
+          {step === 2 && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-3 gap-2">
+                {STARS.presets.map((preset) => {
+                  const active = quantity === preset;
+                  return (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => {
+                        haptic.select();
+                        setAmount(String(preset));
+                        setAmountError('');
+                      }}
+                      className={cn(
+                        'flex h-16 flex-col items-center justify-center rounded-xl border transition-colors',
+                        active
+                          ? 'border-amber-500 bg-amber-500/10'
+                          : 'border-line bg-surface hover:border-fg/20',
+                      )}
+                    >
+                      <span className="flex items-center gap-1 text-[15px] font-semibold">
+                        <Star size={13} className="fill-amber-500 text-amber-500" />
+                        {formatNumber(preset)}
+                      </span>
+                      <span className="mt-0.5 text-[11px] text-muted">
+                        {formatSom(preset * STARS.pricePerStar, som)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <Input
+                label={t('stars_page.custom_amount')}
+                icon={Star}
+                inputMode="numeric"
+                placeholder={String(STARS.min)}
+                value={amount}
+                onChange={(e) => {
+                  setAmount(digitsOnly(e.target.value).slice(0, 7));
+                  setAmountError('');
+                }}
+                suffix={t('stars_page.stars')}
+                error={amountError}
+                hint={t('stars_page.amount_hint', { min: STARS.min, price: STARS.pricePerStar })}
+              />
+
+              <div className="flex items-center justify-between rounded-xl bg-fg/[0.04] px-4 py-3">
+                <span className="text-sm text-muted">{t('order.total')}</span>
+                <span className="font-semibold">{formatSom(total, som)}</span>
+              </div>
+
+              <div className="flex gap-3">
+                <Button variant="secondary" size="lg" className="flex-1" onClick={() => setStep(1)}>
+                  {t('common.back')}
+                </Button>
+                <Button size="lg" className="flex-1" onClick={handleAmountNext}>
+                  {t('common.next')}
+                </Button>
               </div>
             </div>
+          )}
 
-            <div className="flex gap-3">
-              <Button variant="secondary" onClick={() => setStep(2)} className="flex-1">
-                {t('common.back')}
-              </Button>
-              <Button onClick={handleConfirm} className="flex-1">
-                {t('stars_page.confirm')}
-              </Button>
+          {/* ---------- Step 3: confirm ---------- */}
+          {step === 3 && (
+            <div className="space-y-4">
+              <Summary>
+                <SummaryRow label={t('order.recipient')} value={display} />
+                <SummaryRow
+                  label={t('order.quantity')}
+                  value={`${formatNumber(quantity)} ${t('stars_page.stars')}`}
+                />
+                <SummaryRow label={t('order.price_per_unit')} value={formatSom(STARS.pricePerStar, som)} />
+                <BalanceRow price={total} />
+                <SummaryRow label={t('order.total')} value={formatSom(total, som)} strong />
+              </Summary>
+              <p className="px-1 text-xs text-muted">{t('order.delivery_note')}</p>
+
+              <div className="flex gap-3">
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  className="flex-1"
+                  disabled={loading}
+                  onClick={() => setStep(2)}
+                >
+                  {t('common.back')}
+                </Button>
+                <Button size="lg" className="flex-1" loading={loading} onClick={handleConfirm}>
+                  {t('common.confirm')}
+                </Button>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </StepTransition>
+      </Section>
     </Page>
   );
 }

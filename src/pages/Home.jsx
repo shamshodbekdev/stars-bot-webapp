@@ -1,137 +1,139 @@
-import { useTelegram } from '../hooks/useTelegram';
-import { useLanguage } from '../contexts/LanguageContext';
+/**
+ * Home: greeting, balance card, services (Premium, Stars, Gift) and stats.
+ * Neutral page — each service carries its own accent.
+ */
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import Page from '../components/layout/Page';
-import { formatSom } from '../utils/format';
-import { Star, Crown, Gift, TrendingUp, ChevronRight, Wallet } from 'lucide-react';
+import { ArrowUpRight, ChevronRight, Crown, Gift, Plus, RefreshCw, Star } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useUser } from '../contexts/UserContext';
+import Page, { Section } from '../components/layout/Page';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import { Skeleton } from '../components/ui/Skeleton';
+import Avatar from '../components/ui/Avatar';
+import { formatNumber, formatSom } from '../utils/format';
+
+const SERVICES = [
+  { path: '/premium', icon: Crown, key: 'premium', iconClass: 'text-violet-500', bg: 'bg-violet-500/10' },
+  { path: '/stars', icon: Star, key: 'stars', iconClass: 'text-amber-500 fill-amber-500', bg: 'bg-amber-500/10' },
+  { path: '/gift', icon: Gift, key: 'gift', iconClass: 'text-rose-500', bg: 'bg-rose-500/10' },
+];
 
 export default function Home() {
-  const { user } = useTelegram();
   const { t } = useLanguage();
+  const { user, profile, loading, error, refresh } = useUser();
   const navigate = useNavigate();
 
-const services = [
-  {
-    path: '/premium',
-    icon: Crown,
-    title: t('home.premium'),
-    desc: t('home.premium_desc'),
-    color: 'text-violet-500',
-    bg: 'bg-violet-50 dark:bg-violet-500/10'
-  },
-  {
-    path: '/stars',
-    icon: Star,
-    title: t('home.stars'),
-    desc: t('home.stars_desc'),
-    color: 'text-amber-500',
-    bg: 'bg-amber-50 dark:bg-amber-500/10'
-  },
-  {
-    path: '/gift',
-    icon: Gift,
-    title: t('home.gift'),
-    desc: t('home.gift_desc'),
-    color: 'text-rose-500',
-    bg: 'bg-rose-50 dark:bg-rose-500/10'
-  },
-];
+  const stats = [
+    { label: t('stats.orders'), value: profile?.orders },
+    { label: t('stats.referrals'), value: profile?.referrals },
+    { label: t('stats.stars'), value: profile?.stars },
+  ];
 
   return (
     <Page>
-      {/* Header */}
-      <div className="px-4 pt-6 pb-4">
+      <Section className="pt-6">
+        {/* Greeting */}
         <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-tg-hint font-medium">
-              {t('home.greeting')}
-            </p>
-            <h1 className="text-2xl font-bold mt-0.5">
-              {user?.first_name || 'Mehmon'}
+          <div className="min-w-0">
+            <p className="text-sm text-muted">{t('home.greeting')}</p>
+            <h1 className="truncate text-2xl font-semibold tracking-tight">
+              {user?.first_name || t('common.guest')}
             </h1>
           </div>
-          <div className="w-11 h-11 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 dark:from-gray-200 dark:to-gray-400 flex items-center justify-center text-white dark:text-gray-900 font-bold">
-            {user?.first_name?.[0] || 'S'}
-          </div>
+          <button type="button" onClick={() => navigate('/profile')} aria-label={t('nav.profile')}>
+            <Avatar user={user} size={44} />
+          </button>
         </div>
-      </div>
 
-      {/* Balans */}
-      <div className="px-4 mb-6">
-        <div className="bg-gray-900 dark:bg-white rounded-2xl p-5 text-white dark:text-gray-900">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm opacity-70">{t('home.balance')}</span>
-            <Wallet size={18} className="opacity-70" />
+        {/* Balance */}
+        <div className="rounded-2xl bg-fg p-5 text-inverse">
+          <div className="flex items-center justify-between">
+            <span className="text-sm opacity-60">{t('home.balance')}</span>
+            {error && (
+              <button type="button" onClick={refresh} aria-label={t('common.retry')} className="opacity-60">
+                <RefreshCw size={16} />
+              </button>
+            )}
           </div>
-          <div className="text-3xl font-bold tracking-tight mb-4">
-            {formatSom(0)}
+          <div className="mt-2 h-9 text-3xl font-semibold tracking-tight">
+            {loading ? (
+              <Skeleton className="h-8 w-40 bg-inverse/10" />
+            ) : (
+              formatSom(profile?.balance ?? 0, t('common.som'))
+            )}
           </div>
           <button
+            type="button"
             onClick={() => navigate('/balance')}
-            className="w-full bg-white/10 dark:bg-gray-900/10 hover:bg-white/20 dark:hover:bg-gray-900/20 rounded-xl py-2.5 text-sm font-semibold transition-colors"
+            className="mt-4 flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-inverse/10 text-sm font-semibold transition-colors hover:bg-inverse/15"
           >
+            <Plus size={16} />
             {t('home.deposit')}
           </button>
         </div>
-      </div>
 
-      {/* Xizmatlar */}
-      <div className="px-4 mb-6">
-        <h2 className="text-xs font-bold text-tg-hint mb-3 uppercase tracking-wider">
-          {t('home.services')}
-        </h2>
-        <div className="grid grid-cols-2 gap-3">
-          {services.map((service, i) => {
-            const Icon = service.icon;
-            return (
-              <motion.button
-                key={service.path}
-                initial={{ opacity: 0, y: 10 }}
+        {/* Services */}
+        <section>
+          <h2 className="mb-2 px-1 text-xs font-medium uppercase tracking-wider text-muted">
+            {t('home.services')}
+          </h2>
+          <div className="space-y-2">
+            {SERVICES.map(({ path, icon: Icon, key, iconClass, bg }, i) => (
+              <motion.div
+                key={path}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => navigate(service.path)}
-                className="bg-tg-secondaryBg rounded-2xl p-4 text-left border border-tg-hint/5 hover:border-tg-hint/20 transition-colors"
+                transition={{ duration: 0.25, delay: i * 0.05 }}
               >
-                <div className={`w-10 h-10 rounded-xl ${service.bg} flex items-center justify-center mb-3`}>
-                  <Icon size={20} className={service.color} />
-                </div>
-                <p className="font-semibold text-base">{service.title}</p>
-                <p className="text-xs text-tg-hint mt-0.5">{service.desc}</p>
-              </motion.button>
-            );
-          })}
-        </div>
-      </div>
+                <Card onClick={() => navigate(path)} className="flex items-center gap-3">
+                  <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${bg}`}>
+                    <Icon size={22} className={iconClass} />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-semibold">{t(`home.services_list.${key}.title`)}</span>
+                    <span className="block truncate text-sm text-muted">
+                      {t(`home.services_list.${key}.desc`)}
+                    </span>
+                  </span>
+                  <ArrowUpRight size={18} className="shrink-0 text-muted/60" />
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </section>
 
-      {/* Statistika */}
-      <div className="px-4">
-        <div className="bg-tg-secondaryBg rounded-2xl border border-tg-hint/5">
+        {/* Stats */}
+        <Card padded={false}>
           <button
+            type="button"
             onClick={() => navigate('/profile')}
-            className="w-full flex items-center justify-between p-4 border-b border-tg-hint/10"
+            className="flex w-full items-center justify-between border-b border-line px-4 py-3"
           >
-            <div className="flex items-center gap-2">
-              <TrendingUp size={18} className="text-tg-hint" />
-              <span className="text-sm font-semibold">{t('home.statistics')}</span>
-            </div>
-            <ChevronRight size={18} className="text-tg-hint" />
+            <span className="text-sm font-medium">{t('home.statistics')}</span>
+            <ChevronRight size={18} className="text-muted/60" />
           </button>
-          <div className="grid grid-cols-3 p-4">
-            {[
-              { label: t('home.orders'), value: '0' },
-              { label: t('home.referrals'), value: '0' },
-              { label: t('home.stars_count'), value: '0' },
-            ].map((stat, i) => (
-              <div key={i} className="text-center">
-                <p className="text-xl font-bold">{stat.value}</p>
-                <p className="text-xs text-tg-hint mt-0.5">{stat.label}</p>
+          <div className="grid grid-cols-3 divide-x divide-line py-4">
+            {stats.map((s) => (
+              <div key={s.label} className="flex flex-col items-center gap-1 px-2">
+                {loading ? (
+                  <Skeleton className="h-6 w-8" />
+                ) : (
+                  <span className="text-xl font-semibold">{formatNumber(s.value ?? 0)}</span>
+                )}
+                <span className="truncate text-xs text-muted">{s.label}</span>
               </div>
             ))}
           </div>
-        </div>
-      </div>
+        </Card>
+
+        {error && !loading && (
+          <Button variant="secondary" fullWidth icon={RefreshCw} onClick={refresh}>
+            {t('common.retry')}
+          </Button>
+        )}
+      </Section>
     </Page>
   );
 }

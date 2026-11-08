@@ -1,160 +1,260 @@
 {
   "language": {
     "title": "Тилни танланг",
-    "subtitle": "Ботдан қулай фойдаланиш учун тилни танланг",
-    "uzbek": "O'zbekcha",
-    "kril": "Узбекча",
-    "russian": "Русский",
+    "subtitle": "Иловадан қулай фойдаланиш учун тилни танланг",
     "continue": "Давом этиш"
-  },
-  "home": {
-    "greeting": "Салом",
-    "subtitle": "Бугун нима сотиб оламиз?",
-    "balance": "Балансингиз",
-    "deposit": "Пул киритиш",
-    "services": "Хизматлар",
-    "stars": "Stars",
-    "stars_desc": "Сотиб олиш",
-    "premium": "Premium",
-    "premium_desc": "Сотиб олиш",
-    "numbers": "Номер",
-    "numbers_desc": "Олиш",
-    "gift": "Gift",
-    "gift_desc": "Маркет",
-    "statistics": "Статистика",
-    "orders": "Буюртмалар",
-    "referrals": "Рефераллар",
-    "stars_count": "Stars"
   },
   "nav": {
     "home": "Асосий",
     "stars": "Stars",
     "premium": "Premium",
-    "gift": "Gift",
+    "gift": "Совға",
     "profile": "Профил"
+  },
+  "home": {
+    "greeting": "Хуш келибсиз",
+    "balance": "Баланс",
+    "deposit": "Балансни тўлдириш",
+    "services": "Хизматлар",
+    "statistics": "Статистика",
+    "services_list": {
+      "premium": {
+        "title": "Telegram Premium",
+        "desc": "1 ойдан 12 ойгача обуна"
+      },
+      "stars": {
+        "title": "Telegram Stars",
+        "desc": "Ўзингизга ёки дўстингизга"
+      },
+      "gift": {
+        "title": "Совғалар",
+        "desc": "Telegram совғаларини юборинг"
+      }
+    }
+  },
+  "stats": {
+    "balance": "Баланс",
+    "orders": "Буюртмалар",
+    "referrals": "Рефераллар",
+    "stars": "Stars"
+  },
+  "steps": {
+    "recipient": "Қабул қилувчи",
+    "amount": "Миқдор",
+    "duration": "Муддат",
+    "confirm": "Тасдиқлаш"
+  },
+  "recipient": {
+    "self": "Ўзимга",
+    "other": "Бошқага",
+    "placeholder": "username",
+    "hint": "Қабул қилувчининг Telegram username'и",
+    "no_username": "Username ўрнатилмаган",
+    "self_no_username": "Сизда Telegram username йўқ. «Бошқага» ни танлаб, username киритинг."
+  },
+  "order": {
+    "recipient": "Қабул қилувчи",
+    "quantity": "Миқдор",
+    "product": "Маҳсулот",
+    "duration": "Муддат",
+    "price_per_unit": "1 дона нархи",
+    "your_balance": "Балансингиз",
+    "total": "Жами",
+    "delivery_note": "Тўлов балансдан ечилади. Буюртма одатда бир неча дақиқада бажарилади."
   },
   "stars_page": {
     "title": "Stars сотиб олиш",
-    "username": "Қабул қилувчи username",
-    "username_placeholder": "Бўш қолдиринг — ўзингиз учун",
-    "username_hint": "Бўш қолдирсангиз — ўзингизга юборилади",
-    "amount": "Stars миқдори",
-    "price": "Нарх",
-    "balance": "Баланс",
-    "confirm": "Тасдиқлаш",
-    "confirm_title": "Буюртмани тасдиқлаш",
-    "receiver": "Қабул қилувчи",
-    "myself": "Ўзим",
-    "stars": "stars",
-    "step1": "Қабул қилувчи",
-    "step2": "Миқдор",
-    "step3": "Тасдиқлаш"
+    "hero_title": "Telegram Stars",
+    "hero_subtitle": "Кимга юборишни танланг",
+    "custom_amount": "Бошқа миқдор",
+    "amount_hint": "Камида {min} та · 1 та = {price} сўм",
+    "stars": "stars"
   },
-"premium_page": {
-  "title": "Premium сотиб олиш",
-  "username": "Premium совға қилиш учун username",
-  "username_placeholder": "Бўш қолдирсангиз — ўзингизга",
-  "username_hint": "Бўш қолдирсангиз — ўзингизга юборилади",
-  "months": "Муддат",
-  "month": "ой",
-  "price": "Нарх",
-  "balance": "Баланс",
-  "confirm": "Тасдиқлаш",
-  "confirm_title": "Буюртмани тасдиқлаш",
-  "hero_subtitle": "Premium имкониятларни очинг",
-  "selected": "Танланган",
-  "receiver": "Қабул қилувчи",
-  "myself": "Ўзим",
-  "step1": "Қабул қилувчи",
-  "step2": "Муддат",
-  "step3": "Тасдиқлаш"
-},
+  "premium_page": {
+    "title": "Premium сотиб олиш",
+    "hero_subtitle": "Барча имкониятларни очинг",
+    "features": {
+      "stickers": "Махсус стикерлар",
+      "uploads": "4 ГБ гача файллар",
+      "no_ads": "Рекламасиз",
+      "voice": "Овозни матнга"
+    },
+    "months_count": "{n} ой",
+    "popular": "Оммабоп",
+    "save": "{percent}% тежайсиз",
+    "per_month": "ойига {price}"
+  },
   "gift_page": {
-    "title": "Gift Market",
-    "coming_soon": "Тез орада...",
-    "description": "Тез орада бу ерда сиз дўстларингизга совғалар юбора оласиз"
+    "title": "Совғалар",
+    "search": "Совға қидириш",
+    "empty_title": "Ҳеч нарса топилмади",
+    "empty_text": "Бошқа сўз ёки тоифани синаб кўринг",
+    "stars_value": "{n} stars қийматида",
+    "recipient": "Кимга юборилсин?",
+    "message": "Хабар",
+    "message_placeholder": "Яхши тилакларингизни ёзинг",
+    "send": "Юбориш · {price}"
+  },
+  "gifts": {
+    "categories": {
+      "all": "Барчаси",
+      "regular": "Оддий",
+      "unique": "Ноёб"
+    },
+    "items": {
+      "bear": {
+        "name": "Айиқча",
+        "desc": "Севимли айиқча"
+      },
+      "heart": {
+        "name": "Юрак",
+        "desc": "Севги рамзи"
+      },
+      "rose": {
+        "name": "Атиргул",
+        "desc": "Чиройли атиргул"
+      },
+      "gift": {
+        "name": "Совға қутиси",
+        "desc": "Қизил совға қутиси"
+      },
+      "champagne": {
+        "name": "Шампан",
+        "desc": "Байрам учун"
+      },
+      "rocket": {
+        "name": "Ракета",
+        "desc": "Космик ракета"
+      },
+      "flower": {
+        "name": "Гулдаста",
+        "desc": "Гуллар тўплами"
+      },
+      "cake": {
+        "name": "Торт",
+        "desc": "Туғилган кун учун"
+      },
+      "diamond": {
+        "name": "Олмос",
+        "desc": "Қимматбаҳо олмос"
+      },
+      "ring": {
+        "name": "Узук",
+        "desc": "Олмосли узук"
+      },
+      "cup": {
+        "name": "Кубок",
+        "desc": "Ғолиб кубоги"
+      }
+    }
+  },
+  "balance_page": {
+    "title": "Балансни тўлдириш",
+    "card": "Тўлов картаси",
+    "holder": "Эгаси",
+    "copy": "Нусха",
+    "copied_short": "Нусхаланди",
+    "copied": "Карта рақами нусхаланди",
+    "copy_error": "Нусхалаб бўлмади",
+    "amount": "Тўлов суммаси",
+    "amount_hint": "Минимал сумма: {min}",
+    "receipt": "Тўлов чеки",
+    "upload": "Чекни юклаш",
+    "upload_hint": "Скриншот ёки расм, 10 МБ гача",
+    "change": "Алмаштириш",
+    "receipt_added": "Чек қўшилди",
+    "receipt_removed": "Чек олиб ташланди",
+    "how": {
+      "step1": "Юқоридаги картага суммани ўтказинг",
+      "step2": "Тўлов чекини (скриншот) юкланг",
+      "step3": "Админ текширгач, балансингиз тўлдирилади"
+    },
+    "submit": "Чекни юбориш",
+    "receipt_sent": "Чек юборилди. Админ тез орада текширади"
   },
   "profile": {
     "title": "Профил",
-    "balance": "Баланс",
-    "stars": "Stars",
-    "referrals": "Рефераллар",
-    "orders": "Буюртмалар",
-    "settings": "Созламалар",
-    "manage": "Бошқариш",
-    "settings_hint": "Тил, режим, билдиришномалар",
+    "id_copied": "ID нусхаланди",
+    "manage": "Бошқарув",
     "deposit": "Балансни тўлдириш",
     "deposit_hint": "Карта орқали",
-    "logout": "Чиқиш",
-    "id": "ID"
+    "settings": "Созламалар",
+    "settings_hint": "Тил, мавзу, билдиришномалар"
   },
   "settings": {
     "title": "Созламалар",
-    "main": "Асосий",
+    "general": "Асосий",
     "language": "Тил",
+    "language_changed": "Тил ўзгартирилди",
     "notifications": "Билдиришномалар",
-    "notifications_on": "Ёқилган",
-    "notifications_off": "Ўчирилган",
-    "dark_mode": "Тунги режим",
-    "dark_on": "Ёқилган",
-    "dark_off": "Ўчирилган",
-    "support": "Ёрдам",
-    "support_chat": "Қўллаб-қувватлаш",
-    "support_chat_hint": "Чат гуруҳ",
-    "admin": "Админга ёзиш",
-    "admin_hint": "Шахсий мурожаат",
-    "about": "Бот ҳақида",
-    "about_hint": "Версия ва маълумот",
-    "account": "Ҳисоб",
-    "delete": "Ҳисобни ўчириш",
-    "delete_hint": "Қайтариб бўлмайди",
-    "version": "Версия",
-    "developer": "Ишлаб чиқарувчи",
-    "support_247": "Қўллаб-қувватлаш",
-    "close": "Ёпиш",
-    "delete_confirm_title": "Ҳисобни ўчириш",
-    "delete_confirm_text": "Ростдан ҳам ҳисобингизни ўчирмоқчимисиз? Бу амални қайтариб бўлмайди!",
-    "delete_yes": "Ҳа, ўчириш",
-    "cancel": "Бекор қилиш",
-    "language_changed": "Тил муваффақиятли ўзгартирилди",
+    "on": "Ёқилган",
+    "off": "Ўчирилган",
     "notifications_on_toast": "Билдиришномалар ёқилди",
     "notifications_off_toast": "Билдиришномалар ўчирилди",
-    "dark_on_toast": "Тунги режим ёқилди",
-    "dark_off_toast": "Кундузги режим ёқилди"
-  },
-  "balance_page": {
-    "title": "Пул киритиш",
-    "card": "Карта рақами",
-    "amount": "Миқдор",
-    "amount_hint": "Тўланадиган сумма",
-    "payment_info": "Тўлов қилиш тартиби",
-    "step1": "Юқоридаги карта рақамига ўтказма қилинг",
-    "step2": "Чекни (скриншот) юкланг",
-    "step3": "Админ тасдиқлагач, баланс тўлади",
-    "send_receipt": "Чек юбориш",
-    "copy": "Нусхалаш",
-    "copied": "Карта рақами нусхаланди",
-    "copy_error": "Нусхалашда хатолик",
-    "amount_required": "Суммани киритинг",
-    "receipt_sent": "Чек юборилди. Админ тасдиқлайди"
+    "appearance": "Кўриниш",
+    "theme": {
+      "auto": "Авто",
+      "light": "Ёруғ",
+      "dark": "Тунги"
+    },
+    "theme_hint": "«Авто» Telegram мавзусига мослашади",
+    "theme_toast": {
+      "auto": "Мавзу Telegram'га мослаштирилди",
+      "light": "Ёруғ мавзу ёқилди",
+      "dark": "Тунги мавзу ёқилди"
+    },
+    "support": "Ёрдам",
+    "support_chat": "Қўллаб-қувватлаш",
+    "support_chat_hint": "Чат гуруҳи",
+    "admin": "Админга ёзиш",
+    "admin_hint": "Шахсий мурожаат",
+    "about": "Илова ҳақида",
+    "about_hint": "Версия ва маълумот",
+    "about_text": "Telegram Stars, Premium ва совғаларни тез ва қулай сотиб олиш учун илова.",
+    "version": "Версия",
+    "developer": "Ишлаб чиқувчи",
+    "support_hours": "Қўллаб-қувватлаш",
+    "account": "Ҳисоб",
+    "delete": "Ҳисобни ўчириш",
+    "delete_hint": "Бу амални қайтариб бўлмайди",
+    "delete_confirm_title": "Ҳисобни ўчирасизми?",
+    "delete_confirm_text": "Баланс ва буюртмалар тарихи бутунлай ўчирилади. Ўчириш админ орқали амалга оширилади.",
+    "delete_yes": "Админга мурожаат қилиш",
+    "delete_toast": "Ўчириш учун админга ёзинг"
   },
   "toast": {
-    "success": "Муваффақиятли",
-    "error": "Хатолик юз берди",
-    "order_created": "Буюртма яратилди! Тез орада...",
-    "premium_gift": "Premium совға юборилди!",
-    "number_buy": "Рақам сотиб олинмоқда...",
-    "number_success": "Рақам муваффақиятли сотиб олинди!",
-    "delete_account": "Ҳисобни ўчириш учун админга мурожаат қилинг"
+    "order_created": "Буюртма қабул қилинди"
+  },
+  "validation": {
+    "username_required": "Username киритинг",
+    "username_invalid": "Username нотўғри: 5–32 та лотин ҳарфи, рақам ёки _",
+    "amount_required": "Миқдорни киритинг",
+    "stars_min": "Камида {min} stars",
+    "stars_max": "Кўпи билан {max} stars",
+    "deposit_min": "Минимал сумма: {min}",
+    "receipt_required": "Тўлов чекини юкланг",
+    "receipt_type": "Фақат расм юклаш мумкин",
+    "receipt_size": "Файл ҳажми {mb} МБ дан ошмасин",
+    "fix_errors": "Майдонларни тўлдиринг"
+  },
+  "errors": {
+    "generic": "Хатолик юз берди. Қайта уриниб кўринг",
+    "network": "Интернет алоқасини текширинг",
+    "timeout": "Сервер жавоб бермади. Қайта уриниб кўринг",
+    "server": "Серверда хатолик. Кейинроқ уриниб кўринг",
+    "insufficient_balance": "Баланс етарли эмас. Аввал балансни тўлдиринг"
   },
   "common": {
     "back": "Орқага",
+    "next": "Давом этиш",
     "confirm": "Тасдиқлаш",
     "cancel": "Бекор қилиш",
-    "loading": "Юкланмоқда...",
-    "error": "Хатолик юз берди",
-    "success": "Муваффақиятли",
-    "som": "сўм",
-    "next": "Давом этиш"
+    "close": "Ёпиш",
+    "clear": "Тозалаш",
+    "delete": "Ўчириш",
+    "retry": "Қайта уриниш",
+    "optional": "ихтиёрий",
+    "guest": "Меҳмон",
+    "som": "сўм"
   }
 }

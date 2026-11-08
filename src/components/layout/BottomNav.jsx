@@ -1,53 +1,63 @@
-import { Home, Star, Crown, Gift, User } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Crown, Gift, Home, Star, User } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../utils/cn';
+import { haptic } from '../../lib/telegram';
+
+const ITEMS = [
+  { path: '/', icon: Home, key: 'nav.home' },
+  { path: '/stars', icon: Star, key: 'nav.stars' },
+  { path: '/premium', icon: Crown, key: 'nav.premium' },
+  { path: '/gift', icon: Gift, key: 'nav.gift' },
+  { path: '/profile', icon: User, key: 'nav.profile' },
+];
+
+// Sub-pages that highlight a parent tab
+const PARENT = { '/settings': '/profile', '/balance': '/profile' };
 
 export default function BottomNav() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { t } = useLanguage();
-
-  const items = [
-    { path: '/', icon: Home, label: t('nav.home') },
-    { path: '/stars', icon: Star, label: t('nav.stars') },
-    { path: '/premium', icon: Crown, label: t('nav.premium') },
-    { path: '/gift', icon: Gift, label: t('nav.gift') },     // ← Nomer o'rniga Gift
-    { path: '/profile', icon: User, label: t('nav.profile') },
-  ];
+  const activePath = PARENT[pathname] || pathname;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-tg-secondaryBg border-t border-tg-hint/10">
-      <div className="flex justify-around py-2 max-w-md mx-auto">
-        {items.map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname === item.path;
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg/85 pb-safe backdrop-blur-xl">
+      <ul className="mx-auto grid h-16 max-w-lg grid-cols-5">
+        {ITEMS.map(({ path, icon: Icon, key }) => {
+          const active = activePath === path;
           return (
-            <button
-              key={item.path}
-              onClick={() => navigate(item.path)}
-              className="relative flex flex-col items-center gap-1 px-3 py-1"
-            >
-              <Icon
-                size={22}
+            <li key={path}>
+              <button
+                type="button"
+                aria-current={active ? 'page' : undefined}
+                onClick={() => {
+                  // Ignore taps on the current screen only; sub-pages (e.g.
+                  // /settings) still navigate back to their parent tab.
+                  if (pathname === path) return;
+                  haptic.select();
+                  navigate(path);
+                }}
                 className={cn(
-                  'transition-colors',
-                  isActive ? 'text-tg-text' : 'text-tg-hint'
-                )}
-                strokeWidth={isActive ? 2.5 : 1.8}
-              />
-              <span
-                className={cn(
-                  'text-[10px]',
-                  isActive ? 'font-bold text-tg-text' : 'font-medium text-tg-hint'
+                  'relative flex h-full w-full flex-col items-center justify-center gap-1 transition-colors',
+                  active ? 'text-fg' : 'text-muted',
                 )}
               >
-                {item.label}
-              </span>
-            </button>
+                {active && (
+                  <motion.span
+                    layoutId="nav-indicator"
+                    className="absolute top-0 h-0.5 w-8 rounded-full bg-fg"
+                    transition={{ type: 'spring', stiffness: 500, damping: 40 }}
+                  />
+                )}
+                <Icon size={22} strokeWidth={active ? 2.2 : 1.8} />
+                <span className={cn('text-[10px]', active ? 'font-semibold' : 'font-medium')}>{t(key)}</span>
+              </button>
+            </li>
           );
         })}
-      </div>
-    </div>
+      </ul>
+    </nav>
   );
 }

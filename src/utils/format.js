@@ -1,27 +1,30 @@
-export function formatSom(amount) {
-  if (!amount) return "0 so'm";
-  const num = Math.floor(Number(amount));
-  return num.toLocaleString('uz-UZ').replace(/,/g, ' ') + " so'm";
+/**
+ * Formatting helpers. Numbers use a thin space as thousands separator,
+ * which is the convention for so'm amounts in all three app languages.
+ */
+
+/** 1234567 -> "1 234 567" */
+export function formatNumber(value) {
+  const num = Math.floor(Number(value) || 0);
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 }
 
-export function formatNumber(num) {
-  if (!num) return '0';
-  return Number(num).toLocaleString('uz-UZ').replace(/,/g, ' ');
+/** 15000 -> "15 000 so'm" (currency label comes from translations) */
+export function formatSom(amount, currency = "so'm") {
+  return `${formatNumber(amount)} ${currency}`;
 }
 
-export function formatDate(date) {
-  if (!date) return '—';
-  const d = new Date(date);
-  return d.toLocaleDateString('uz-UZ', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+/** Normalises user input like " @Name " to "Name". */
+export function cleanUsername(value = '') {
+  return value.trim().replace(/^@+/, '');
 }
 
-export function formatUsername(username) {
-  if (!username) return '—';
-  return `@${username.replace(/^@/, '')}`;
+/** Telegram usernames: 5–32 chars, letters, digits and underscores. */
+export function isValidUsername(value = '') {
+  return /^[a-zA-Z][a-zA-Z0-9_]{4,31}$/.test(cleanUsername(value));
+}
+
+/** Keeps only digits — used for numeric text inputs. */
+export function digitsOnly(value = '') {
+  return String(value).replace(/\D/g, '');
 }

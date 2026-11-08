@@ -1,7 +1,10 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect } from 'react';
+import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { useLanguage } from './contexts/LanguageContext';
+import { backButton } from './lib/telegram';
+import { useGoBack } from './components/layout/Header';
 import LanguageSelector from './components/LanguageSelector';
+import BottomNav from './components/layout/BottomNav';
 import Home from './pages/Home';
 import Stars from './pages/Stars';
 import Premium from './pages/Premium';
@@ -9,48 +12,57 @@ import GiftMarket from './pages/GiftMarket';
 import Profile from './pages/Profile';
 import Balance from './pages/Balance';
 import Settings from './pages/Settings';
-import BottomNav from './components/layout/BottomNav';
 
-function AnimatedRoutes() {
-  const location = useLocation();
+/** Shows Telegram's native back button on every screen except Home. */
+function TelegramBackButton() {
+  const { pathname } = useLocation();
+  const goBack = useGoBack();
 
+  useEffect(() => {
+    if (pathname === '/') return undefined;
+    return backButton.show(goBack);
+    // goBack is recreated each render; pathname is the meaningful trigger
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
+  return null;
+}
+
+/** Scrolls to top on every route change. */
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => window.scrollTo(0, 0), [pathname]);
+  return null;
+}
+
+/** Each page animates itself in via <Page />. */
+function AppRoutes() {
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={location.pathname}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.15 }}
-      >
-        <Routes location={location}>
-          <Route path="/" element={<Home />} />
-          <Route path="/stars" element={<Stars />} />
-          <Route path="/premium" element={<Premium />} />
-          <Route path="/gift" element={<GiftMarket />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/balance" element={<Balance />} />
-          <Route path="/settings" element={<Settings />} />
-          {/* /numbers route olib tashlandi */}
-        </Routes>
-      </motion.div>
-    </AnimatePresence>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/stars" element={<Stars />} />
+      <Route path="/premium" element={<Premium />} />
+      <Route path="/gift" element={<GiftMarket />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/balance" element={<Balance />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
-function App() {
+export default function App() {
   const { showLanguageSelector } = useLanguage();
 
-  if (showLanguageSelector) {
-    return <LanguageSelector />;
-  }
+  if (showLanguageSelector) return <LanguageSelector />;
 
+  // HashRouter: works on static hosting without server rewrites
   return (
-    <BrowserRouter>
-      <AnimatedRoutes />
+    <HashRouter>
+      <ScrollToTop />
+      <TelegramBackButton />
+      <AppRoutes />
       <BottomNav />
-    </BrowserRouter>
+    </HashRouter>
   );
 }
-
-export default App;

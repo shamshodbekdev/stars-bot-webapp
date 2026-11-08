@@ -1,56 +1,73 @@
 import { motion } from 'framer-motion';
-import { Spinner } from '../icons';
+import { Loader2 } from 'lucide-react';
 import { cn } from '../../utils/cn';
+import { haptic } from '../../lib/telegram';
 
+/** Visual variants */
+const VARIANTS = {
+  primary: 'bg-fg text-inverse hover:bg-fg/90',
+  secondary: 'bg-surface text-fg border border-line hover:bg-fg/[0.03]',
+  ghost: 'bg-transparent text-fg hover:bg-fg/5',
+  danger: 'bg-red-600 text-white hover:bg-red-600/90',
+  success: 'bg-emerald-600 text-white hover:bg-emerald-600/90',
+};
+
+const SIZES = {
+  sm: 'h-9 px-3 text-sm rounded-lg gap-1.5',
+  md: 'h-11 px-4 text-sm rounded-xl gap-2',
+  lg: 'h-12 px-5 text-[15px] rounded-xl gap-2',
+};
+
+const ICON_SIZES = { sm: 16, md: 18, lg: 18 };
+
+/**
+ * Button with 5 variants, 3 sizes, optional leading icon and loading state.
+ * While `loading` the button is disabled and shows a spinner.
+ */
 export default function Button({
   children,
-  onClick,
   variant = 'primary',
   size = 'md',
   fullWidth = false,
   disabled = false,
-  icon: Icon,
   loading = false,
-  className = '',
+  icon: Icon,
+  type = 'button',
+  className,
+  onClick,
+  ...props
 }) {
-  const variants = {
-    primary: 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:opacity-90',
-    secondary: 'bg-tg-secondaryBg text-tg-text border border-tg-hint/10 hover:bg-tg-hint/5',
-    ghost: 'hover:bg-tg-secondaryBg text-tg-text',
-    danger: 'bg-red-500 text-white hover:bg-red-600',
-    success: 'bg-emerald-500 text-white hover:bg-emerald-600',
-  };
+  const isDisabled = disabled || loading;
 
-  const sizes = {
-    sm: 'px-3 py-2 text-sm',
-    md: 'px-4 py-3 text-sm',
-    lg: 'px-6 py-4 text-base',
+  const handleClick = (e) => {
+    haptic.impact('light');
+    onClick?.(e);
   };
 
   return (
     <motion.button
-      whileTap={{ scale: 0.97 }}
-      onClick={onClick}
-      disabled={disabled || loading}
+      type={type}
+      whileTap={isDisabled ? undefined : { scale: 0.98 }}
+      transition={{ duration: 0.15 }}
+      disabled={isDisabled}
+      aria-busy={loading || undefined}
+      onClick={handleClick}
       className={cn(
-        variants[variant],
-        sizes[size],
+        'inline-flex items-center justify-center font-semibold whitespace-nowrap',
+        'transition-colors duration-200 disabled:opacity-50 disabled:pointer-events-none',
+        VARIANTS[variant],
+        SIZES[size],
         fullWidth && 'w-full',
-        'rounded-xl font-semibold',
-        'transition-all duration-150',
-        'flex items-center justify-center gap-2',
-        'disabled:opacity-50 disabled:cursor-not-allowed',
-        className
+        className,
       )}
+      {...props}
     >
       {loading ? (
-        <Spinner size={18} />
+        <Loader2 size={ICON_SIZES[size]} className="animate-spin" />
       ) : (
-        <>
-          {Icon && <Icon size={18} />}
-          {children}
-        </>
+        Icon && <Icon size={ICON_SIZES[size]} strokeWidth={2} />
       )}
+      {children}
     </motion.button>
   );
 }

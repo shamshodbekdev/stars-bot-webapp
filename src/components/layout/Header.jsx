@@ -1,35 +1,39 @@
 import { ChevronLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import WebApp from '@twa-dev/sdk';
-import { motion } from 'framer-motion';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../contexts/LanguageContext';
 
-export default function Header({ title, showBack = false, right }) {
+/**
+ * Sticky page header with a back button. Goes back in history when there is
+ * one, otherwise to the home screen (e.g. when a page was opened directly).
+ */
+export function useGoBack() {
   const navigate = useNavigate();
+  const location = useLocation();
+  return () => (location.key !== 'default' ? navigate(-1) : navigate('/', { replace: true }));
+}
 
-  const handleBack = () => {
-    if (showBack) {
-      navigate(-1);
-    } else {
-      WebApp.close();
-    }
-  };
+export default function Header({ title, showBack = true, right }) {
+  const goBack = useGoBack();
+  const { t } = useLanguage();
 
   return (
-    <motion.div
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      className="sticky top-0 z-40 bg-tg-bg/95 backdrop-blur-xl border-b border-tg-hint/10"
-    >
-      <div className="flex items-center justify-between px-4 h-14">
-        <button
-          onClick={handleBack}
-          className="p-2 -ml-2 rounded-full hover:bg-tg-secondaryBg transition-colors"
-        >
-          <ChevronLeft size={24} className="text-tg-text" />
-        </button>
-        <h1 className="text-base font-bold flex-1 text-center">{title}</h1>
-        <div className="w-10">{right}</div>
+    <header className="sticky top-0 z-30 border-b border-line bg-bg/80 backdrop-blur-xl">
+      <div className="mx-auto flex h-14 max-w-lg items-center gap-2 px-2">
+        <div className="w-10">
+          {showBack && (
+            <button
+              type="button"
+              onClick={goBack}
+              aria-label={t('common.back')}
+              className="grid h-10 w-10 place-items-center rounded-full transition-colors hover:bg-fg/5 active:bg-fg/10"
+            >
+              <ChevronLeft size={22} />
+            </button>
+          )}
+        </div>
+        <h1 className="flex-1 truncate text-center text-base font-semibold">{title}</h1>
+        <div className="flex w-10 justify-end">{right}</div>
       </div>
-    </motion.div>
+    </header>
   );
 }

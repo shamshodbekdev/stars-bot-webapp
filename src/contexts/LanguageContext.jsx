@@ -1,58 +1,68 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import uzbek from '../locales/uzbek.json';
+/**
+ * i18n: three locales, persisted choice, `t('a.b', { name })` lookups with
+ * {placeholder} interpolation. Missing keys fall back to Uzbek, then the key.
+ */
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import uz from '../locales/uzbek.json';
 import kril from '../locales/kril-uzbek.json';
-import russian from '../locales/rus.json';
+import ru from '../locales/rus.json';
+import { storage } from '../utils/storage';
 
-const translations = {
-  uz: uzbek,
-  kril: kril,
-  ru: russian,
-};
+const translations = { uz, kril, ru };
+const DEFAULT_LANGUAGE = 'uz';
 
-const LanguageContext = createContext();
+/** Language list shown in the selector and settings. */
+export const LANGUAGES = [
+  { code: 'uz', label: "O'zbekcha", desc: 'Lotin alifbosi', htmlLang: 'uz' },
+  { code: 'kril', label: 'Ўзбекча', desc: 'Кирилл алифбоси', htmlLang: 'uz-Cyrl' },
+  { code: 'ru', label: 'Русский', desc: 'Русский язык', htmlLang: 'ru' },
+];
+
+const LanguageContext = createContext(null);
+
+const lookup = (dict, key) => key.split('.').reduce((obj, k) => obj?.[k], dict);
+
+/**
+ * Translate a key in a specific language (independent of the current one).
+ * Missing keys fall back to Uzbek, then to the key itself.
+ */
+export function translate(lang, key, vars) {
+  let value = lookup(translations[lang], key) ?? lookup(translations[DEFAULT_LANGUAGE], key);
+  if (typeof value !== 'string') return value ?? key;
+  if (vars) value = value.replace(/\{(\w+)\}/g, (_, k) => (vars[k] ?? `{${k}}`));
+  return value;
+}
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState(() => {
-    return localStorage.getItem('language') || 'uz';
-  });
-
-  const [showLanguageSelector, setShowLanguageSelector] = useState(() => {
-    return !localStorage.getItem('language');
-  });
+  const saved = storage.get('language');
+  const [language, setLanguage] = useState(translations[saved] ? saved : DEFAULT_LANGUAGE);
+  // First launch: no saved choice yet -> show the language selector
+  const [showLanguageSelector, setShowLanguageSelector] = useState(!translations[saved]);
 
   useEffect(() => {
-    localStorage.setItem('language', language);
+    const meta = LANGUAGES.find((l) => l.code === language);
+    document.documentElement.lang = meta?.htmlLang || 'uz';
   }, [language]);
 
-  const t = (key) => {
-    const keys = key.split('.');
-    let value = translations[language];
-    for (const k of keys) {
-      value = value?.[k];
-    }
-    return value || key;
-  };
+  const t = useCallback((key, vars) => translate(language, key, vars), [language]);
 
-  const changeLanguage = (lang) => {
-    setLanguage(lang);
+  const changeLanguage = useCallback((code) => {
+    if (!translations[code]) return;
+    setLanguage(code);
+    storage.set('language', code);
     setShowLanguageSelector(false);
-  };
+  }, []);
 
-  return (
-    <LanguageContext.Provider
-      value={{
-        language,
-        t,
-        changeLanguage,
-        showLanguageSelector,
-        setShowLanguageSelector,
-      }}
-    >
-      {children}
-    </LanguageContext.Provider>
+  const value = useMemo(
+    () => ({ language, t, changeLanguage, showLanguageSelector }),
+    [language, t, changeLanguage, showLanguageSelector],
   );
+
+  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }
 
 export function useLanguage() {
-  return useContext(LanguageContext);
+  const ctx = useContext(LanguageContext);
+  if (!ctx) throw new Error('useLanguage must be used within LanguageProvider');
+  return ctx;
 }

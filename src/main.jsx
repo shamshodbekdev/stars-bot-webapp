@@ -1,25 +1,25 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import WebApp from '@twa-dev/sdk'
-import App from './App.jsx'
-import { LanguageProvider } from './contexts/LanguageContext'
-import { ToastProvider } from './components/ui/Toast'
-import './index.css'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.jsx';
+import { initTelegram } from './lib/telegram';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { LanguageProvider } from './contexts/LanguageContext';
+import { UserProvider } from './contexts/UserContext';
+import { ToastProvider } from './components/ui/Toast';
+import './index.css';
 
-WebApp.ready()
-WebApp.expand()
-WebApp.setHeaderColor('secondary_bg_color')
-
-if (WebApp.colorScheme === 'dark') {
-  document.documentElement.classList.add('dark')
-}
+initTelegram();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <LanguageProvider>
-      <ToastProvider>
-        <App />
-      </ToastProvider>
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <ToastProvider>
+          <UserProvider>
+            <App />
+          </UserProvider>
+        </ToastProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   </React.StrictMode>,
-)
+);

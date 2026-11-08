@@ -1,52 +1,40 @@
 /** @type {import('tailwindcss').Config} */
+
+// Helper: maps a CSS variable holding "R G B" channels to a Tailwind color
+// that supports opacity modifiers (e.g. bg-fg/10).
+const token = (name) => `rgb(var(--c-${name}) / <alpha-value>)`;
+
 export default {
-  content: ["./index.html", "./src/**/*.{js,jsx}"],
+  content: ['./index.html', './src/**/*.{js,jsx}'],
   darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-        },
-        tg: {
-          bg: 'var(--tg-theme-bg-color, #ffffff)',
-          text: 'var(--tg-theme-text-color, #111827)',
-          hint: 'var(--tg-theme-hint-color, #6b7280)',
-          link: 'var(--tg-theme-link-color, #2563eb)',
-          button: 'var(--tg-theme-button-color, #2563eb)',
-          buttonText: 'var(--tg-theme-button-text-color, #ffffff)',
-          secondaryBg: 'var(--tg-theme-secondary-bg-color, #f7f8fa)',
-        },
+        // Neutral design tokens (see src/index.css for light/dark values)
+        bg: token('bg'), // page background
+        surface: token('surface'), // cards, inputs
+        fg: token('fg'), // primary text / inverted surfaces
+        muted: token('muted'), // secondary text
+        line: token('line'), // borders & dividers
+        inverse: token('inverse'), // text on top of `fg` surfaces
       },
-      animation: {
-        'fade-in': 'fadeIn 0.3s ease-out',
-        'slide-up': 'slideUp 0.3s ease-out',
-        'slide-down': 'slideDown 0.3s ease-out',
+      fontFamily: {
+        sans: [
+          'Inter',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Segoe UI',
+          'Roboto',
+          'Helvetica Neue',
+          'Arial',
+          'sans-serif',
+        ],
+        mono: ['SF Mono', 'Menlo', 'Consolas', 'monospace'],
       },
-      keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        slideUp: {
-          '0%': { transform: 'translateY(8px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        slideDown: {
-          '0%': { transform: 'translateY(-8px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
+      spacing: {
+        safe: 'env(safe-area-inset-bottom)',
       },
     },
   },
   plugins: [],
-}
+};

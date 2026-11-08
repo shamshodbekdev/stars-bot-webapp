@@ -1,300 +1,197 @@
+/**
+ * Settings: language, notifications, appearance, support, account.
+ */
 import { useState } from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useTelegram } from '../hooks/useTelegram';
+import {
+  Bell, Check, Globe, Info, MessageCircle, Monitor, Moon, Sun, Trash2, UserRound,
+} from 'lucide-react';
+import { useLanguage, LANGUAGES, translate } from '../contexts/LanguageContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { useToast } from '../components/ui/Toast';
-import Page from '../components/layout/Page';
+import Page, { Section } from '../components/layout/Page';
 import Header from '../components/layout/Header';
 import BottomSheet from '../components/ui/BottomSheet';
 import Button from '../components/ui/Button';
-import {
-  Globe, Bell, Moon, Sun, Shield, Trash2, Info, ChevronRight,
-  Check, MessageCircle, FileText
-} from 'lucide-react';
-
-const LANGUAGES = [
-  { code: 'uz', label: "O'zbekcha", desc: "O'zbek tili (lotin)" },
-  { code: 'kril', label: "Узбекча", desc: "O'zbek tili (kirill)" },
-  { code: 'ru', label: "Русский", desc: "Русский язык" },
-];
+import Segmented from '../components/ui/Segmented';
+import Switch from '../components/ui/Switch';
+import { ListGroup, ListItem } from '../components/ui/List';
+import { cn } from '../utils/cn';
+import { storage } from '../utils/storage';
+import { haptic, openTelegramLink } from '../lib/telegram';
+import { APP_VERSION, LINKS } from '../config';
 
 export default function Settings() {
   const { t, language, changeLanguage } = useLanguage();
-  const { WebApp, theme } = useTelegram();
+  const { mode, setMode } = useTheme();
   const { showToast } = useToast();
 
-  const [showLanguageSheet, setShowLanguageSheet] = useState(false);
-  const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(theme === 'dark');
-  const [showAbout, setShowAbout] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [sheet, setSheet] = useState(null); // 'language' | 'about' | 'delete' | null
+  const [notifications, setNotifications] = useState(() => storage.get('notifications') !== 'off');
 
-  const handleLanguageChange = (code) => {
+  const closeSheet = () => setSheet(null);
+  const currentLanguage = LANGUAGES.find((l) => l.code === language);
+
+  const handleLanguage = (code) => {
+    closeSheet();
+    if (code === language) return;
     changeLanguage(code);
-    setShowLanguageSheet(false);
-    showToast(t('settings.language_changed'), 'success');
+    // Confirm in the newly selected language
+    showToast(translate(code, 'settings.language_changed'), 'success');
   };
 
-  const handleNotificationsToggle = () => {
-    setNotifications(!notifications);
-    showToast(
-      notifications ? t('settings.notifications_off_toast') : t('settings.notifications_on_toast'),
-      'info'
-    );
+  const handleNotifications = (on) => {
+    haptic.select();
+    setNotifications(on);
+    storage.set('notifications', on ? 'on' : 'off');
+    showToast(on ? t('settings.notifications_on_toast') : t('settings.notifications_off_toast'), 'info');
   };
 
-  const handleDarkModeToggle = () => {
-    const newMode = !darkMode;
-    setDarkMode(newMode);
-    if (newMode) {
-      document.documentElement.classList.add('dark');
-      WebApp?.setHeaderColor('secondary_bg_color');
-    } else {
-      document.documentElement.classList.remove('dark');
-      WebApp?.setHeaderColor('bg_color');
-    }
-    showToast(
-      newMode ? t('settings.dark_on_toast') : t('settings.dark_off_toast'),
-      'info'
-    );
+  const handleTheme = (next) => {
+    setMode(next);
+    showToast(t(`settings.theme_toast.${next}`), 'info');
   };
 
-  const handleDeleteAccount = () => {
-    setShowDeleteConfirm(false);
-    showToast(t('toast.delete_account'), 'warning');
+  const handleDelete = () => {
+    closeSheet();
+    showToast(t('settings.delete_toast'), 'warning');
+    openTelegramLink(LINKS.admin);
   };
-
-  const currentLang = LANGUAGES.find(l => l.code === language);
 
   return (
     <Page>
-      <Header title={t('settings.title')} showBack />
+      <Header title={t('settings.title')} />
 
-      <div className="px-4 py-4">
-        <h2 className="text-xs font-bold text-tg-hint mb-2 uppercase tracking-wider">
-          {t('settings.main')}
-        </h2>
-        <div className="bg-tg-secondaryBg rounded-2xl border border-tg-hint/5 overflow-hidden">
-          <button
-            onClick={() => setShowLanguageSheet(true)}
-            className="w-full flex items-center gap-3 px-4 py-4 border-b border-tg-hint/10 active:bg-tg-hint/5 transition-colors"
-          >
-            <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center">
-              <Globe size={18} className="text-blue-500" />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-sm font-semibold">{t('settings.language')}</p>
-              <p className="text-xs text-tg-hint mt-0.5">{currentLang?.label}</p>
-            </div>
-            <ChevronRight size={18} className="text-tg-hint" />
-          </button>
+      <Section className="space-y-6">
+        <ListGroup title={t('settings.general')}>
+          <ListItem
+            icon={Globe}
+            title={t('settings.language')}
+            subtitle={currentLanguage?.label}
+            onClick={() => setSheet('language')}
+          />
+          <ListItem
+            icon={Bell}
+            title={t('settings.notifications')}
+            subtitle={notifications ? t('settings.on') : t('settings.off')}
+            right={
+              <Switch checked={notifications} onChange={handleNotifications} label={t('settings.notifications')} />
+            }
+          />
+        </ListGroup>
 
-          <div className="w-full flex items-center gap-3 px-4 py-4 border-b border-tg-hint/10">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center">
-              <Bell size={18} className="text-amber-500" />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-sm font-semibold">{t('settings.notifications')}</p>
-              <p className="text-xs text-tg-hint mt-0.5">
-                {notifications ? t('settings.notifications_on') : t('settings.notifications_off')}
-              </p>
-            </div>
-            <button
-              onClick={handleNotificationsToggle}
-              className={`relative w-11 h-6 rounded-full transition-colors ${
-                notifications ? 'bg-emerald-500' : 'bg-tg-hint/30'
-              }`}
-            >
-              <div
-                className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
-                  notifications ? 'translate-x-5' : 'translate-x-0.5'
-                }`}
-              />
-            </button>
-          </div>
+        <section>
+          <h2 className="mb-2 px-1 text-xs font-medium uppercase tracking-wider text-muted">
+            {t('settings.appearance')}
+          </h2>
+          <Segmented
+            layoutId="theme-mode"
+            value={mode}
+            onChange={handleTheme}
+            options={[
+              { value: 'auto', label: t('settings.theme.auto'), icon: Monitor },
+              { value: 'light', label: t('settings.theme.light'), icon: Sun },
+              { value: 'dark', label: t('settings.theme.dark'), icon: Moon },
+            ]}
+          />
+          <p className="mt-2 px-1 text-xs text-muted">{t('settings.theme_hint')}</p>
+        </section>
 
-          <div className="w-full flex items-center gap-3 px-4 py-4">
-            <div className="w-9 h-9 rounded-xl bg-violet-500/10 flex items-center justify-center">
-              {darkMode ? (
-                <Moon size={18} className="text-violet-500" />
-              ) : (
-                <Sun size={18} className="text-violet-500" />
-              )}
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-sm font-semibold">{t('settings.dark_mode')}</p>
-              <p className="text-xs text-tg-hint mt-0.5">
-                {darkMode ? t('settings.dark_on') : t('settings.dark_off')}
-              </p>
-            </div>
-            <button
-              onClick={handleDarkModeToggle}
-              className={`relative w-11 h-6 rounded-full transition-colors ${
-                darkMode ? 'bg-emerald-500' : 'bg-tg-hint/30'
-              }`}
-            >
-              <div
-                className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
-                  darkMode ? 'translate-x-5' : 'translate-x-0.5'
-                }`}
-              />
-            </button>
-          </div>
-        </div>
-      </div>
+        <ListGroup title={t('settings.support')}>
+          <ListItem
+            icon={MessageCircle}
+            title={t('settings.support_chat')}
+            subtitle={t('settings.support_chat_hint')}
+            onClick={() => openTelegramLink(LINKS.supportChat)}
+          />
+          <ListItem
+            icon={UserRound}
+            title={t('settings.admin')}
+            subtitle={t('settings.admin_hint')}
+            onClick={() => openTelegramLink(LINKS.admin)}
+          />
+          <ListItem
+            icon={Info}
+            title={t('settings.about')}
+            subtitle={t('settings.about_hint')}
+            onClick={() => setSheet('about')}
+          />
+        </ListGroup>
 
-      <div className="px-4 mb-4">
-        <h2 className="text-xs font-bold text-tg-hint mb-2 uppercase tracking-wider">
-          {t('settings.support')}
-        </h2>
-        <div className="bg-tg-secondaryBg rounded-2xl border border-tg-hint/5 overflow-hidden">
-          <button
-            onClick={() => {
-              WebApp?.openTelegramLink('https://t.me/starsrkhim_chat');
-            }}
-            className="w-full flex items-center gap-3 px-4 py-4 border-b border-tg-hint/10 active:bg-tg-hint/5 transition-colors"
-          >
-            <div className="w-9 h-9 rounded-xl bg-cyan-500/10 flex items-center justify-center">
-              <MessageCircle size={18} className="text-cyan-500" />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-sm font-semibold">{t('settings.support_chat')}</p>
-              <p className="text-xs text-tg-hint mt-0.5">{t('settings.support_chat_hint')}</p>
-            </div>
-            <ChevronRight size={18} className="text-tg-hint" />
-          </button>
+        <ListGroup title={t('settings.account')}>
+          <ListItem
+            icon={Trash2}
+            danger
+            title={t('settings.delete')}
+            subtitle={t('settings.delete_hint')}
+            onClick={() => setSheet('delete')}
+          />
+        </ListGroup>
 
-          <button
-            onClick={() => {
-              WebApp?.openTelegramLink('https://t.me/starsrkhim_admin');
-            }}
-            className="w-full flex items-center gap-3 px-4 py-4 border-b border-tg-hint/10 active:bg-tg-hint/5 transition-colors"
-          >
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-              <Shield size={18} className="text-emerald-500" />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-sm font-semibold">{t('settings.admin')}</p>
-              <p className="text-xs text-tg-hint mt-0.5">{t('settings.admin_hint')}</p>
-            </div>
-            <ChevronRight size={18} className="text-tg-hint" />
-          </button>
+        <p className="text-center text-xs text-muted">
+          Stars Bot · {t('settings.version')} {APP_VERSION}
+        </p>
+      </Section>
 
-          <button
-            onClick={() => setShowAbout(true)}
-            className="w-full flex items-center gap-3 px-4 py-4 active:bg-tg-hint/5 transition-colors"
-          >
-            <div className="w-9 h-9 rounded-xl bg-gray-500/10 flex items-center justify-center">
-              <Info size={18} className="text-tg-hint" />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-sm font-semibold">{t('settings.about')}</p>
-              <p className="text-xs text-tg-hint mt-0.5">{t('settings.about_hint')}</p>
-            </div>
-            <ChevronRight size={18} className="text-tg-hint" />
-          </button>
-        </div>
-      </div>
-
-      <div className="px-4">
-        <h2 className="text-xs font-bold text-tg-hint mb-2 uppercase tracking-wider">
-          {t('settings.account')}
-        </h2>
-        <div className="bg-tg-secondaryBg rounded-2xl border border-tg-hint/5 overflow-hidden">
-          <button
-            onClick={() => setShowDeleteConfirm(true)}
-            className="w-full flex items-center gap-3 px-4 py-4 active:bg-tg-hint/5 transition-colors"
-          >
-            <div className="w-9 h-9 rounded-xl bg-red-500/10 flex items-center justify-center">
-              <Trash2 size={18} className="text-red-500" />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-sm font-semibold text-red-500">{t('settings.delete')}</p>
-              <p className="text-xs text-tg-hint mt-0.5">{t('settings.delete_hint')}</p>
-            </div>
-            <ChevronRight size={18} className="text-tg-hint" />
-          </button>
-        </div>
-      </div>
-
-      <div className="px-4 py-6 text-center">
-        <p className="text-xs text-tg-hint">Stars Bot</p>
-        <p className="text-xs text-tg-hint mt-1">{t('settings.version')} 1.0.0</p>
-      </div>
-
-      {/* Bottom sheets */}
-      <BottomSheet isOpen={showLanguageSheet} onClose={() => setShowLanguageSheet(false)}>
-        <h3 className="text-lg font-bold mb-4">{t('settings.language')}</h3>
+      {/* Language sheet */}
+      <BottomSheet isOpen={sheet === 'language'} onClose={closeSheet} title={t('settings.language')}>
         <div className="space-y-2">
-          {LANGUAGES.map((lang) => (
-            <button
-              key={lang.code}
-              onClick={() => handleLanguageChange(lang.code)}
-              className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
-                language === lang.code
-                  ? 'border-gray-900 dark:border-white bg-tg-secondaryBg'
-                  : 'border-tg-hint/10 bg-tg-bg hover:bg-tg-secondaryBg'
-              }`}
-            >
-              <div className="text-left">
-                <p className="font-semibold">{lang.label}</p>
-                <p className="text-xs text-tg-hint mt-0.5">{lang.desc}</p>
-              </div>
-              {language === lang.code && (
-                <div className="w-6 h-6 rounded-full bg-gray-900 dark:bg-white flex items-center justify-center">
-                  <Check size={14} className="text-white dark:text-gray-900" />
-                </div>
-              )}
-            </button>
+          {LANGUAGES.map((lang) => {
+            const active = lang.code === language;
+            return (
+              <button
+                key={lang.code}
+                type="button"
+                onClick={() => handleLanguage(lang.code)}
+                className={cn(
+                  'flex w-full items-center justify-between rounded-xl border p-4 text-left transition-colors',
+                  active ? 'border-fg bg-surface' : 'border-line bg-surface hover:border-fg/20',
+                )}
+              >
+                <span>
+                  <span className="block font-medium">{lang.label}</span>
+                  <span className="mt-0.5 block text-xs text-muted">{lang.desc}</span>
+                </span>
+                {active && (
+                  <span className="grid h-6 w-6 place-items-center rounded-full bg-fg text-inverse">
+                    <Check size={14} strokeWidth={3} />
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </BottomSheet>
+
+      {/* About sheet */}
+      <BottomSheet isOpen={sheet === 'about'} onClose={closeSheet} title={t('settings.about')}>
+        <p className="mb-4 text-sm text-muted">{t('settings.about_text')}</p>
+        <dl className="mb-4 divide-y divide-line rounded-xl border border-line bg-surface px-4 text-sm">
+          {[
+            [t('settings.version'), APP_VERSION],
+            [t('settings.developer'), LINKS.adminUsername],
+            [t('settings.support_hours'), '24/7'],
+          ].map(([k, v]) => (
+            <div key={k} className="flex justify-between py-3">
+              <dt className="text-muted">{k}</dt>
+              <dd className="font-medium">{v}</dd>
+            </div>
           ))}
-        </div>
+        </dl>
+        <Button fullWidth variant="secondary" onClick={closeSheet}>
+          {t('common.close')}
+        </Button>
       </BottomSheet>
 
-      <BottomSheet isOpen={showAbout} onClose={() => setShowAbout(false)}>
-        <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center mx-auto mb-4">
-            <FileText size={28} className="text-white" />
-          </div>
-          <h3 className="text-xl font-bold mb-2">Stars Bot</h3>
-          <p className="text-sm text-tg-hint mb-6">
-            Telegram Stars, Premium va raqamlarni sotib olish uchun eng qulay bot
-          </p>
-          <div className="bg-tg-secondaryBg rounded-xl p-4 text-left space-y-2 mb-4">
-            <div className="flex justify-between text-sm">
-              <span className="text-tg-hint">{t('settings.version')}</span>
-              <span className="font-semibold">1.0.0</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-tg-hint">{t('settings.developer')}</span>
-              <span className="font-semibold">@starsrkhim_admin</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-tg-hint">{t('settings.support_247')}</span>
-              <span className="font-semibold">24/7</span>
-            </div>
-          </div>
-          <Button fullWidth onClick={() => setShowAbout(false)}>
-            {t('settings.close')}
+      {/* Delete confirmation */}
+      <BottomSheet isOpen={sheet === 'delete'} onClose={closeSheet} title={t('settings.delete_confirm_title')}>
+        <p className="mb-5 text-sm text-muted">{t('settings.delete_confirm_text')}</p>
+        <div className="space-y-2">
+          <Button fullWidth variant="danger" icon={Trash2} onClick={handleDelete}>
+            {t('settings.delete_yes')}
           </Button>
-        </div>
-      </BottomSheet>
-
-      <BottomSheet isOpen={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)}>
-        <div className="text-center">
-          <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
-            <Trash2 size={28} className="text-red-500" />
-          </div>
-          <h3 className="text-xl font-bold mb-2">{t('settings.delete_confirm_title')}</h3>
-          <p className="text-sm text-tg-hint mb-6">
-            {t('settings.delete_confirm_text')}
-          </p>
-          <div className="space-y-2">
-            <Button variant="danger" fullWidth onClick={handleDeleteAccount}>
-              {t('settings.delete_yes')}
-            </Button>
-            <Button variant="secondary" fullWidth onClick={() => setShowDeleteConfirm(false)}>
-              {t('settings.cancel')}
-            </Button>
-          </div>
+          <Button fullWidth variant="secondary" onClick={closeSheet}>
+            {t('common.cancel')}
+          </Button>
         </div>
       </BottomSheet>
     </Page>

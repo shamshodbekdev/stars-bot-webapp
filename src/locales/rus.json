@@ -1,160 +1,260 @@
 {
   "language": {
     "title": "Выберите язык",
-    "subtitle": "Выберите язык для удобного использования бота",
-    "uzbek": "O'zbekcha",
-    "kril": "Узбекча",
-    "russian": "Русский",
+    "subtitle": "Выберите язык для удобной работы с приложением",
     "continue": "Продолжить"
-  },
-  "home": {
-    "greeting": "Привет",
-    "subtitle": "Что купим сегодня?",
-    "balance": "Ваш баланс",
-    "deposit": "Пополнить",
-    "services": "Услуги",
-    "stars": "Stars",
-    "stars_desc": "Купить",
-    "premium": "Premium",
-    "premium_desc": "Купить",
-    "numbers": "Номер",
-    "numbers_desc": "Получить",
-    "gift": "Gift",
-    "gift_desc": "Маркет",
-    "statistics": "Статистика",
-    "orders": "Заказы",
-    "referrals": "Рефералы",
-    "stars_count": "Stars"
   },
   "nav": {
     "home": "Главная",
     "stars": "Stars",
     "premium": "Premium",
-    "gift": "Gift",
+    "gift": "Подарки",
     "profile": "Профиль"
+  },
+  "home": {
+    "greeting": "Добро пожаловать",
+    "balance": "Баланс",
+    "deposit": "Пополнить баланс",
+    "services": "Услуги",
+    "statistics": "Статистика",
+    "services_list": {
+      "premium": {
+        "title": "Telegram Premium",
+        "desc": "Подписка от 1 до 12 месяцев"
+      },
+      "stars": {
+        "title": "Telegram Stars",
+        "desc": "Себе или другу"
+      },
+      "gift": {
+        "title": "Подарки",
+        "desc": "Отправляйте подарки в Telegram"
+      }
+    }
+  },
+  "stats": {
+    "balance": "Баланс",
+    "orders": "Заказы",
+    "referrals": "Рефералы",
+    "stars": "Stars"
+  },
+  "steps": {
+    "recipient": "Получатель",
+    "amount": "Количество",
+    "duration": "Срок",
+    "confirm": "Подтверждение"
+  },
+  "recipient": {
+    "self": "Себе",
+    "other": "Другому",
+    "placeholder": "username",
+    "hint": "Telegram username получателя",
+    "no_username": "Username не установлен",
+    "self_no_username": "У вас нет username в Telegram. Выберите «Другому» и введите username."
+  },
+  "order": {
+    "recipient": "Получатель",
+    "quantity": "Количество",
+    "product": "Товар",
+    "duration": "Срок",
+    "price_per_unit": "Цена за 1 шт.",
+    "your_balance": "Ваш баланс",
+    "total": "Итого",
+    "delivery_note": "Оплата списывается с баланса. Заказ обычно выполняется за несколько минут."
   },
   "stars_page": {
     "title": "Купить Stars",
-    "username": "Username получателя",
-    "username_placeholder": "Оставьте пустым — для себя",
-    "username_hint": "Оставьте пустым — отправится вам",
-    "amount": "Количество Stars",
-    "price": "Цена",
-    "balance": "Баланс",
-    "confirm": "Подтвердить",
-    "confirm_title": "Подтверждение заказа",
-    "receiver": "Получатель",
-    "myself": "Себе",
-    "stars": "stars",
-    "step1": "Получатель",
-    "step2": "Количество",
-    "step3": "Подтверждение"
+    "hero_title": "Telegram Stars",
+    "hero_subtitle": "Выберите получателя",
+    "custom_amount": "Своё количество",
+    "amount_hint": "Минимум {min} шт. · 1 шт. = {price} сум",
+    "stars": "stars"
   },
-"premium_page": {
-  "title": "Купить Premium",
-  "username": "Username для подарка Premium",
-  "username_placeholder": "Оставьте пустым — для себя",
-  "username_hint": "Оставьте пустым — отправится вам",
-  "months": "Срок",
-  "month": "мес",
-  "price": "Цена",
-  "balance": "Баланс",
-  "confirm": "Подтвердить",
-  "confirm_title": "Подтверждение заказа",
-  "hero_subtitle": "Откройте возможности Premium",
-  "selected": "Выбрано",
-  "receiver": "Получатель",
-  "myself": "Себе",
-  "step1": "Получатель",
-  "step2": "Срок",
-  "step3": "Подтверждение"
-},
+  "premium_page": {
+    "title": "Купить Premium",
+    "hero_subtitle": "Откройте все возможности",
+    "features": {
+      "stickers": "Особые стикеры",
+      "uploads": "Файлы до 4 ГБ",
+      "no_ads": "Без рекламы",
+      "voice": "Голос в текст"
+    },
+    "months_count": "{n} мес.",
+    "popular": "Популярно",
+    "save": "Экономия {percent}%",
+    "per_month": "{price} в месяц"
+  },
   "gift_page": {
-    "title": "Gift Market",
-    "coming_soon": "Скоро...",
-    "description": "Скоро здесь вы сможете отправлять подарки друзьям"
+    "title": "Подарки",
+    "search": "Поиск подарка",
+    "empty_title": "Ничего не найдено",
+    "empty_text": "Попробуйте другой запрос или категорию",
+    "stars_value": "Стоимость {n} stars",
+    "recipient": "Кому отправить?",
+    "message": "Сообщение",
+    "message_placeholder": "Напишите пожелание",
+    "send": "Отправить · {price}"
+  },
+  "gifts": {
+    "categories": {
+      "all": "Все",
+      "regular": "Обычные",
+      "unique": "Уникальные"
+    },
+    "items": {
+      "bear": {
+        "name": "Мишка",
+        "desc": "Милый мишка"
+      },
+      "heart": {
+        "name": "Сердце",
+        "desc": "Символ любви"
+      },
+      "rose": {
+        "name": "Роза",
+        "desc": "Красивая роза"
+      },
+      "gift": {
+        "name": "Подарок",
+        "desc": "Красная подарочная коробка"
+      },
+      "champagne": {
+        "name": "Шампанское",
+        "desc": "Для праздника"
+      },
+      "rocket": {
+        "name": "Ракета",
+        "desc": "Космическая ракета"
+      },
+      "flower": {
+        "name": "Букет",
+        "desc": "Букет цветов"
+      },
+      "cake": {
+        "name": "Торт",
+        "desc": "На день рождения"
+      },
+      "diamond": {
+        "name": "Алмаз",
+        "desc": "Драгоценный алмаз"
+      },
+      "ring": {
+        "name": "Кольцо",
+        "desc": "Кольцо с бриллиантом"
+      },
+      "cup": {
+        "name": "Кубок",
+        "desc": "Кубок победителя"
+      }
+    }
+  },
+  "balance_page": {
+    "title": "Пополнение баланса",
+    "card": "Карта для оплаты",
+    "holder": "Владелец",
+    "copy": "Копировать",
+    "copied_short": "Скопировано",
+    "copied": "Номер карты скопирован",
+    "copy_error": "Не удалось скопировать",
+    "amount": "Сумма пополнения",
+    "amount_hint": "Минимальная сумма: {min}",
+    "receipt": "Чек об оплате",
+    "upload": "Загрузить чек",
+    "upload_hint": "Скриншот или фото, до 10 МБ",
+    "change": "Заменить",
+    "receipt_added": "Чек добавлен",
+    "receipt_removed": "Чек удалён",
+    "how": {
+      "step1": "Переведите сумму на карту выше",
+      "step2": "Загрузите чек (скриншот) об оплате",
+      "step3": "После проверки администратором баланс будет пополнен"
+    },
+    "submit": "Отправить чек",
+    "receipt_sent": "Чек отправлен. Администратор скоро проверит"
   },
   "profile": {
     "title": "Профиль",
-    "balance": "Баланс",
-    "stars": "Stars",
-    "referrals": "Рефералы",
-    "orders": "Заказы",
-    "settings": "Настройки",
+    "id_copied": "ID скопирован",
     "manage": "Управление",
-    "settings_hint": "Язык, режим, уведомления",
     "deposit": "Пополнить баланс",
     "deposit_hint": "Через карту",
-    "logout": "Выйти",
-    "id": "ID"
+    "settings": "Настройки",
+    "settings_hint": "Язык, тема, уведомления"
   },
   "settings": {
     "title": "Настройки",
-    "main": "Основные",
+    "general": "Основные",
     "language": "Язык",
+    "language_changed": "Язык изменён",
     "notifications": "Уведомления",
-    "notifications_on": "Включены",
-    "notifications_off": "Отключены",
-    "dark_mode": "Тёмная тема",
-    "dark_on": "Включена",
-    "dark_off": "Отключена",
-    "support": "Помощь",
-    "support_chat": "Поддержка",
-    "support_chat_hint": "Чат-группа",
-    "admin": "Написать админу",
+    "on": "Включены",
+    "off": "Выключены",
+    "notifications_on_toast": "Уведомления включены",
+    "notifications_off_toast": "Уведомления выключены",
+    "appearance": "Оформление",
+    "theme": {
+      "auto": "Авто",
+      "light": "Светлая",
+      "dark": "Тёмная"
+    },
+    "theme_hint": "«Авто» следует теме Telegram",
+    "theme_toast": {
+      "auto": "Тема следует Telegram",
+      "light": "Включена светлая тема",
+      "dark": "Включена тёмная тема"
+    },
+    "support": "Поддержка",
+    "support_chat": "Чат поддержки",
+    "support_chat_hint": "Групповой чат",
+    "admin": "Написать администратору",
     "admin_hint": "Личное обращение",
-    "about": "О боте",
+    "about": "О приложении",
     "about_hint": "Версия и информация",
-    "account": "Аккаунт",
-    "delete": "Удалить аккаунт",
-    "delete_hint": "Нельзя отменить",
+    "about_text": "Приложение для быстрой и удобной покупки Telegram Stars, Premium и подарков.",
     "version": "Версия",
     "developer": "Разработчик",
-    "support_247": "Поддержка",
-    "close": "Закрыть",
-    "delete_confirm_title": "Удаление аккаунта",
-    "delete_confirm_text": "Вы действительно хотите удалить аккаунт? Это действие нельзя отменить!",
-    "delete_yes": "Да, удалить",
-    "cancel": "Отмена",
-    "language_changed": "Язык успешно изменён",
-    "notifications_on_toast": "Уведомления включены",
-    "notifications_off_toast": "Уведомления отключены",
-    "dark_on_toast": "Тёмная тема включена",
-    "dark_off_toast": "Светлая тема включена"
-  },
-  "balance_page": {
-    "title": "Пополнить баланс",
-    "card": "Номер карты",
-    "amount": "Сумма",
-    "amount_hint": "Сумма к оплате",
-    "payment_info": "Порядок оплаты",
-    "step1": "Переведите на карту выше",
-    "step2": "Загрузите чек (скриншот)",
-    "step3": "После подтверждения админом баланс пополнится",
-    "send_receipt": "Отправить чек",
-    "copy": "Копировать",
-    "copied": "Номер карты скопирован",
-    "copy_error": "Ошибка копирования",
-    "amount_required": "Введите сумму",
-    "receipt_sent": "Чек отправлен. Админ подтвердит"
+    "support_hours": "Поддержка",
+    "account": "Аккаунт",
+    "delete": "Удалить аккаунт",
+    "delete_hint": "Это действие необратимо",
+    "delete_confirm_title": "Удалить аккаунт?",
+    "delete_confirm_text": "Баланс и история заказов будут удалены безвозвратно. Удаление выполняется через администратора.",
+    "delete_yes": "Связаться с администратором",
+    "delete_toast": "Напишите администратору для удаления"
   },
   "toast": {
-    "success": "Успешно",
-    "error": "Произошла ошибка",
-    "order_created": "Заказ создан! Скоро...",
-    "premium_gift": "Premium подарок отправлен!",
-    "number_buy": "Покупка номера...",
-    "number_success": "Номер успешно куплен!",
-    "delete_account": "Для удаления аккаунта обратитесь к админу"
+    "order_created": "Заказ принят"
+  },
+  "validation": {
+    "username_required": "Введите username",
+    "username_invalid": "Неверный username: 5–32 латинских букв, цифр или _",
+    "amount_required": "Введите количество",
+    "stars_min": "Минимум {min} stars",
+    "stars_max": "Максимум {max} stars",
+    "deposit_min": "Минимальная сумма: {min}",
+    "receipt_required": "Загрузите чек об оплате",
+    "receipt_type": "Можно загрузить только изображение",
+    "receipt_size": "Размер файла не более {mb} МБ",
+    "fix_errors": "Заполните обязательные поля"
+  },
+  "errors": {
+    "generic": "Произошла ошибка. Попробуйте ещё раз",
+    "network": "Проверьте подключение к интернету",
+    "timeout": "Сервер не ответил. Попробуйте ещё раз",
+    "server": "Ошибка сервера. Попробуйте позже",
+    "insufficient_balance": "Недостаточно средств. Сначала пополните баланс"
   },
   "common": {
     "back": "Назад",
+    "next": "Далее",
     "confirm": "Подтвердить",
     "cancel": "Отмена",
-    "loading": "Загрузка...",
-    "error": "Произошла ошибка",
-    "success": "Успешно",
-    "som": "сум",
-    "next": "Продолжить"
+    "close": "Закрыть",
+    "clear": "Очистить",
+    "delete": "Удалить",
+    "retry": "Повторить",
+    "optional": "необязательно",
+    "guest": "Гость",
+    "som": "сум"
   }
 }

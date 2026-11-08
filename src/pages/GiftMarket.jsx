@@ -1,251 +1,209 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+/**
+ * Gift market (accent: rose): search, categories, grid and a purchase sheet.
+ */
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
+import { PackageSearch, Search, Send, Star, X } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { useTelegram } from '../hooks/useTelegram';
-import { useToast } from '../components/ui/Toast';
-import Page from '../components/layout/Page';
+import { useRecipient } from '../hooks/useRecipient';
+import { usePurchase } from '../hooks/usePurchase';
+import Page, { Section } from '../components/layout/Page';
 import Header from '../components/layout/Header';
 import BottomSheet from '../components/ui/BottomSheet';
 import Button from '../components/ui/Button';
+import GiftImage from '../components/ui/GiftImage';
+import RecipientField from '../components/order/RecipientField';
 import { GIFTS, CATEGORIES } from '../data/gifts';
+import { cn } from '../utils/cn';
 import { formatSom } from '../utils/format';
-import { Search, Star, Send, User, Check, Image as ImageIcon } from 'lucide-react';
+import { haptic } from '../lib/telegram';
 
-// Lazy-loaded gift image
-function GiftImage({ src, alt }) {
-  const [loaded, setLoaded] = useState(false);
-  const [error, setError] = useState(false);
-  const imgRef = useRef(null);
-
-  useEffect(() => {
-    if (imgRef.current?.complete) {
-      setLoaded(true);
-    }
-  }, []);
-
-  return (
-    <div className="aspect-square bg-tg-bg rounded-xl mb-3 flex items-center justify-center overflow-hidden relative p-2">
-      {!loaded && !error && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-8 h-8 rounded-full bg-tg-hint/10 animate-pulse" />
-        </div>
-      )}
-      {error ? (
-        <div className="flex flex-col items-center justify-center text-tg-hint">
-          <ImageIcon size={32} className="opacity-30" />
-        </div>
-      ) : (
-        <img
-          ref={imgRef}
-          src={src}
-          alt={alt}
-          className={`w-full h-full object-contain transition-opacity duration-300 ${
-            loaded ? 'opacity-100' : 'opacity-0'
-          }`}
-          loading="lazy"
-          decoding="async"
-          onLoad={() => setLoaded(true)}
-          onError={() => setError(true)}
-        />
-      )}
-    </div>
-  );
-}
+const MESSAGE_LIMIT = 255;
 
 export default function GiftMarket() {
-  const { t, language } = useLanguage();
-  const { user } = useTelegram();
-  const { showToast } = useToast();
+  const { t } = useLanguage();
+  const { recipient, setRecipient, error: recipientError, validate, reset } = useRecipient();
+  const { purchase, loading } = usePurchase();
 
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [search, setSearch] = useState('');
-  const [selectedGift, setSelectedGift] = useState(null);
-  const [recipient, setRecipient] = useState('self');
-  const [recipientUsername, setRecipientUsername] = useState('');
+  const [category, setCategory] = useState('all');
+  const [query, setQuery] = useState('');
+  const [selected, setSelected] = useState(null);
   const [message, setMessage] = useState('');
 
-  const filteredGifts = useMemo(() => {
-    let list = GIFTS;
-    if (activeCategory !== 'all') {
-      list = list.filter(g => g.category === activeCategory);
-    }
-    if (search) {
-      list = list.filter(g =>
-        g.name[language].toLowerCase().includes(search.toLowerCase())
-      );
-    }
-    return list;
-  }, [activeCategory, search, language]);
+  const som = t('common.som');
+  const giftName = (gift) => t(`gifts.items.${gift.id}.name`);
 
-  const handleBuy = () => {
-    if (recipient === 'someone' && !recipientUsername.trim()) {
-      showToast('Username kiriting', 'error');
-      return;
-    }
-    showToast(`Sovg'a yuborilmoqda...`, 'info');
-    setTimeout(() => {
-      showToast('Sovg\'a muvaffaqiyatli yuborildi!', 'success');
-      setSelectedGift(null);
-      setRecipient('self');
-      setRecipientUsername('');
-      setMessage('');
-    }, 1500);
+  // Filter by category and by the translated name
+  const gifts = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return GIFTS.filter(
+      (g) =>
+        (category === 'all' || g.category === category) &&
+        (!q || t(`gifts.items.${g.id}.name`).toLowerCase().includes(q)),
+    );
+  }, [category, query, t]);
+
+  const closeSheet = () => {
+    if (loading) return;
+    setSelected(null);
+  };
+
+  const openGift = (gift) => {
+    haptic.impact('light');
+    reset();
+    setMessage('');
+    setSelected(gift);
+  };
+
+  const handleBuy = async () => {
+    const username = validate();
+    if (!username) return haptic.notify('error');
+    const ok = await purchase({
+      type: 'gift',
+      giftId: selected.id,
+      username,
+      message: message.trim(),
+      price: selected.price,
+    });
+    if (ok) setSelected(null);
   };
 
   return (
     <Page>
-      <Header title="Gift Market" showBack />
+      <Header title={t('gift_page.title')} />
 
-      {/* Search */}
-      <div className="px-4 pt-4">
-        <div className="flex items-center gap-2 bg-tg-secondaryBg rounded-xl px-3 py-3 border border-tg-hint/5">
-          <Search size={18} className="text-tg-hint" />
+      <Section className="space-y-3">
+        {/* Search */}
+        <div className="flex h-11 items-center gap-2 rounded-xl border border-line bg-surface px-3.5 focus-within:border-fg/40">
+          <Search size={18} className="shrink-0 text-muted" />
           <input
-            type="text"
-            placeholder="Sovg'a qidirish"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="bg-transparent outline-none flex-1 text-sm"
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t('gift_page.search')}
+            className="h-full min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted/60 [&::-webkit-search-cancel-button]:hidden"
           />
-        </div>
-      </div>
-
-      {/* Categories */}
-      <div className="px-4 py-4 overflow-x-auto scrollbar-hide">
-        <div className="flex gap-2">
-          {CATEGORIES.map(cat => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${
-                activeCategory === cat.id
-                  ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
-                  : 'bg-tg-secondaryBg text-tg-hint'
-              }`}
-            >
-              {cat.label[language]}
+          {query && (
+            <button type="button" onClick={() => setQuery('')} aria-label={t('common.clear')} className="text-muted">
+              <X size={16} />
             </button>
-          ))}
+          )}
         </div>
-      </div>
 
-      {/* Gifts grid */}
-      <div className="px-4 pb-6">
-        {filteredGifts.length === 0 ? (
-          <div className="text-center py-12 text-tg-hint text-sm">
-            Giftlar topilmadi
+        {/* Categories */}
+        <div className="-mx-4 overflow-x-auto px-4 scrollbar-hide">
+          <div className="flex gap-2">
+            {CATEGORIES.map((id) => {
+              const active = category === id;
+              const count = id === 'all' ? GIFTS.length : GIFTS.filter((g) => g.category === id).length;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => {
+                    haptic.select();
+                    setCategory(id);
+                  }}
+                  className={cn(
+                    'flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-4 text-sm font-medium transition-colors',
+                    active ? 'border-fg bg-fg text-inverse' : 'border-line bg-surface text-muted hover:text-fg',
+                  )}
+                >
+                  {t(`gifts.categories.${id}`)}
+                  <span className={cn('text-xs', active ? 'opacity-60' : 'opacity-70')}>{count}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Grid */}
+        {gifts.length === 0 ? (
+          <div className="flex flex-col items-center py-16 text-center">
+            <PackageSearch size={36} strokeWidth={1.5} className="mb-3 text-muted/60" />
+            <p className="font-medium">{t('gift_page.empty_title')}</p>
+            <p className="mt-1 text-sm text-muted">{t('gift_page.empty_text')}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
-            {filteredGifts.map((gift, i) => (
+          <div className="grid grid-cols-2 gap-3 pt-1 min-[420px]:grid-cols-3">
+            {gifts.map((gift, i) => (
               <motion.button
                 key={gift.id}
-                initial={{ opacity: 0, y: 10 }}
+                type="button"
+                layout
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.03 }}
+                transition={{ duration: 0.2, delay: Math.min(i * 0.03, 0.3) }}
                 whileTap={{ scale: 0.97 }}
-                onClick={() => setSelectedGift(gift)}
-                className="bg-tg-secondaryBg rounded-2xl p-3 text-center border border-tg-hint/5 hover:border-tg-hint/20 transition-colors"
+                onClick={() => openGift(gift)}
+                className="rounded-2xl border border-line bg-surface p-3 text-left transition-colors hover:border-rose-500/40"
               >
-                <GiftImage src={gift.image} alt={gift.name[language]} />
-                <p className="font-semibold text-sm">{gift.name[language]}</p>
-                <div className="flex items-center justify-center gap-1 mt-1">
-                  <Star size={12} className="text-amber-500 fill-amber-500" />
-                  <span className="text-xs text-tg-hint">{gift.stars}</span>
+                <GiftImage src={gift.image} alt={giftName(gift)} className="mb-3 rounded-xl bg-fg/[0.03] p-2" />
+                <p className="truncate text-sm font-semibold">{giftName(gift)}</p>
+                <div className="mt-1 flex items-center justify-between gap-1">
+                  <span className="text-sm font-semibold text-rose-500">{formatSom(gift.price, som)}</span>
+                  <span className="flex items-center gap-0.5 text-xs text-muted">
+                    <Star size={11} className="fill-amber-500 text-amber-500" />
+                    {gift.stars}
+                  </span>
                 </div>
-                <p className="font-bold text-sm mt-1">{formatSom(gift.price)}</p>
               </motion.button>
             ))}
           </div>
         )}
-      </div>
+      </Section>
 
-      {/* Gift detail sheet */}
-      <BottomSheet isOpen={!!selectedGift} onClose={() => setSelectedGift(null)}>
-        {selectedGift && (
+      {/* Purchase sheet */}
+      <BottomSheet isOpen={Boolean(selected)} onClose={closeSheet} title={selected ? giftName(selected) : ''}>
+        {selected && (
           <div className="space-y-5">
-            {/* Gift preview */}
-            <div className="text-center">
-              <div className="w-32 h-32 mx-auto bg-tg-secondaryBg rounded-2xl flex items-center justify-center overflow-hidden mb-4 relative">
-                <GiftImage src={selectedGift.image} alt={selectedGift.name[language]} />
-              </div>
-              <div className="flex items-center justify-center gap-1 mb-2">
-                <Star size={16} className="text-amber-500 fill-amber-500" />
-                <span className="text-sm text-tg-hint">{selectedGift.stars}</span>
-              </div>
-              <p className="text-2xl font-bold">{formatSom(selectedGift.price)}</p>
-            </div>
-
-            {/* Recipient */}
-            <div>
-              <p className="text-sm font-semibold mb-2">Kimga yuborilsin?</p>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => setRecipient('self')}
-                  className={`flex items-center justify-center gap-2 p-3 rounded-xl font-semibold text-sm transition-colors ${
-                    recipient === 'self'
-                      ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
-                      : 'bg-tg-secondaryBg text-tg-text'
-                  }`}
-                >
-                  <User size={16} />
-                  O'zimga
-                </button>
-                <button
-                  onClick={() => setRecipient('someone')}
-                  className={`flex items-center justify-center gap-2 p-3 rounded-xl font-semibold text-sm transition-colors ${
-                    recipient === 'someone'
-                      ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
-                      : 'bg-tg-secondaryBg text-tg-text'
-                  }`}
-                >
-                  <Send size={16} />
-                  Boshqaga
-                </button>
-              </div>
-              {recipient === 'self' && (
-                <p className="text-xs text-tg-hint mt-2 flex items-center gap-1">
-                  <Check size={12} className="text-emerald-500" />
-                  @{user?.username || 'sizning'}'ga yuboriladi
-                </p>
-              )}
-            </div>
-
-            {/* Username input */}
-            {recipient === 'someone' && (
-              <div>
-                <input
-                  type="text"
-                  placeholder="@username"
-                  value={recipientUsername}
-                  onChange={(e) => setRecipientUsername(e.target.value)}
-                  className="w-full bg-tg-secondaryBg rounded-xl px-4 py-3 text-sm outline-none"
-                />
-                <p className="text-xs text-tg-hint mt-1.5">
-                  Qabul qiluvchining Telegram @username
-                </p>
-              </div>
-            )}
-
-            {/* Message */}
-            <div>
-              <p className="text-sm font-semibold mb-2">Xabar qo'shish</p>
-              <textarea
-                placeholder="Yaxshi so'zlar yozing..."
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                maxLength={255}
-                rows={3}
-                className="w-full bg-tg-secondaryBg rounded-xl px-4 py-3 text-sm outline-none resize-none"
+            <div className="flex items-center gap-4">
+              <GiftImage
+                src={selected.image}
+                alt={giftName(selected)}
+                eager
+                className="w-24 shrink-0 rounded-2xl border border-line bg-surface p-2"
               />
-              <p className="text-xs text-tg-hint text-right mt-1">
-                {message.length}/255
+              <div className="min-w-0">
+                <p className="text-sm text-muted">{t(`gifts.items.${selected.id}.desc`)}</p>
+                <p className="mt-1 text-2xl font-semibold tracking-tight">{formatSom(selected.price, som)}</p>
+                <p className="mt-0.5 flex items-center gap-1 text-xs text-muted">
+                  <Star size={12} className="fill-amber-500 text-amber-500" />
+                  {t('gift_page.stars_value', { n: selected.stars })}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <p className="mb-2 text-sm font-medium">{t('gift_page.recipient')}</p>
+              <RecipientField
+                layoutId="gift-recipient"
+                value={recipient}
+                onChange={setRecipient}
+                error={recipientError}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="gift-message" className="mb-2 flex justify-between text-sm font-medium">
+                {t('gift_page.message')}
+                <span className="font-normal text-muted">{t('common.optional')}</span>
+              </label>
+              <textarea
+                id="gift-message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value.slice(0, MESSAGE_LIMIT))}
+                placeholder={t('gift_page.message_placeholder')}
+                rows={3}
+                className="w-full resize-none rounded-xl border border-line bg-surface px-3.5 py-3 text-[15px] outline-none placeholder:text-muted/60 focus:border-fg/40"
+              />
+              <p className="mt-1 text-right text-xs text-muted">
+                {message.length}/{MESSAGE_LIMIT}
               </p>
             </div>
 
-            {/* Buy button */}
-            <Button fullWidth size="lg" onClick={handleBuy} icon={Send}>
-              Yuborish · {formatSom(selectedGift.price)}
+            <Button fullWidth size="lg" icon={Send} loading={loading} onClick={handleBuy}>
+              {t('gift_page.send', { price: formatSom(selected.price, som) })}
             </Button>
           </div>
         )}
