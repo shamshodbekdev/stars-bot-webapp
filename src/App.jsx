@@ -20,7 +20,10 @@ function TelegramBackButton() {
 
   useEffect(() => {
     if (pathname === '/') return undefined;
-    return backButton.show(goBack);
+    const hide = backButton.show(goBack);
+    // React calls whatever an effect returns as its cleanup — only ever hand
+    // it a function, or it throws "n is not a function" and blanks the app.
+    return typeof hide === 'function' ? hide : undefined;
     // goBack is recreated each render; pathname is the meaningful trigger
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
@@ -31,7 +34,16 @@ function TelegramBackButton() {
 /** Scrolls to top on every route change. */
 function ScrollToTop() {
   const { pathname } = useLocation();
-  useEffect(() => window.scrollTo(0, 0), [pathname]);
+  // Block body on purpose: an arrow like `() => window.scrollTo(0, 0)` returns
+  // scrollTo's result as the effect cleanup. Inside Telegram that value is not
+  // undefined, so React called it on the first route change -> "n is not a function".
+  useEffect(() => {
+    try {
+      window.scrollTo(0, 0);
+    } catch {
+      /* ignore */
+    }
+  }, [pathname]);
   return null;
 }
 

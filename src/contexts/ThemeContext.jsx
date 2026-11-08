@@ -17,7 +17,10 @@ export function ThemeProvider({ children }) {
   const [telegramScheme, setTelegramScheme] = useState(getColorScheme);
 
   // Track Telegram theme changes while the app is open
-  useEffect(() => onThemeChanged(() => setTelegramScheme(getColorScheme())), []);
+  useEffect(() => {
+    const unsubscribe = onThemeChanged(() => setTelegramScheme(getColorScheme()));
+    return typeof unsubscribe === 'function' ? unsubscribe : undefined;
+  }, []);
 
   const resolved = mode === 'auto' ? telegramScheme : mode;
 

@@ -23,15 +23,17 @@ export const APP_VERSION = '1.1.0';
 
 /** Telegram Stars pricing. */
 export const STARS = {
-  pricePerStar: 90, // so'm
+  pricePerStar: 180, // so'm — must match bot/app/services/shop_catalog.py (server rejects mismatches)
   min: 50,
   max: 1000000,
   presets: [50, 100, 250, 500, 1000, 2500],
 };
 
-/** Telegram Premium plans. `bonus` is the saving in percent. */
+/**
+ * Telegram Premium plans. `bonus` is the saving in percent.
+ * Fragment can only gift 3, 6 or 12 months; prices must match the server catalog.
+ */
 export const PREMIUM_PLANS = [
-  { months: 1, price: 75000, bonus: 0, popular: false },
   { months: 3, price: 160000, bonus: 5, popular: false },
   { months: 6, price: 290000, bonus: 10, popular: true },
   { months: 12, price: 400000, bonus: 20, popular: false },

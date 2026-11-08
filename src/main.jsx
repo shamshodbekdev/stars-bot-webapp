@@ -6,12 +6,14 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { UserProvider } from './contexts/UserContext';
 import { ToastProvider } from './components/ui/Toast';
+import ErrorBoundary from './components/ErrorBoundary';
 import './index.css';
 
 initTelegram();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
+    <ErrorBoundary>
     <ThemeProvider>
       <LanguageProvider>
         <ToastProvider>
@@ -21,5 +23,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         </ToastProvider>
       </LanguageProvider>
     </ThemeProvider>
+    </ErrorBoundary>
   </React.StrictMode>,
 );

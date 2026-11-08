@@ -242,7 +242,16 @@
     "network": "Internet aloqasini tekshiring",
     "timeout": "Server javob bermadi. Qayta urinib ko'ring",
     "server": "Serverda xatolik. Keyinroq urinib ko'ring",
-    "insufficient_balance": "Balans yetarli emas. Avval balansni to'ldiring"
+    "insufficient_balance": "Balans yetarli emas. Avval balansni to'ldiring",
+    "fragment_error": "Buyurtma bajarilmadi, pul balansingizga qaytarildi",
+    "busy": "Oldingi buyurtma hali bajarilmoqda, biroz kuting",
+    "price_changed": "Narx o'zgardi. Ilovani qayta oching",
+    "unauthorized": "Ilovani Telegram ichidan qayta oching",
+    "banned": "Hisobingiz bloklangan",
+    "invalid_username": "Username noto'g'ri",
+    "invalid_amount": "Summa noto'g'ri",
+    "invalid_receipt": "Chek rasm yoki PDF bo'lishi kerak",
+    "file_too_large": "Fayl 10 MB dan katta"
   },
   "common": {
     "back": "Orqaga",

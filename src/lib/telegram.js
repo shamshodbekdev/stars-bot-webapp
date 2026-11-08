@@ -21,6 +21,18 @@ const supports = (version) => {
 
 /** Initialise the Mini App: signal readiness and take the full height. */
 export function initTelegram() {
+  // Telegram launches the app as `index.html#tgWebAppData=...&tgWebAppVersion=...`.
+  // The SDK has already parsed (and cached) those params at import time, so drop
+  // them from the URL — otherwise HashRouter treats them as a route path.
+  try {
+    if (window.location.hash.includes('tgWebApp')) {
+      const { pathname, search } = window.location;
+      window.history.replaceState(window.history.state, '', `${pathname}${search}#/`);
+    }
+  } catch {
+    /* ignore */
+  }
+
   try {
     WebApp.ready();
     WebApp.expand();
@@ -43,7 +55,13 @@ export const getColorScheme = () => WebApp?.colorScheme === 'dark' ? 'dark' : 'l
 export function onThemeChanged(callback) {
   try {
     WebApp.onEvent('themeChanged', callback);
-    return () => WebApp.offEvent('themeChanged', callback);
+    return () => {
+      try {
+        WebApp.offEvent('themeChanged', callback);
+      } catch {
+        /* ignore */
+      }
+    };
   } catch {
     return () => {};
   }
@@ -94,8 +112,12 @@ export const backButton = {
       WebApp.BackButton.onClick(handler);
       WebApp.BackButton.show();
       return () => {
-        WebApp.BackButton.offClick(handler);
-        WebApp.BackButton.hide();
+        try {
+          WebApp.BackButton.offClick(handler);
+          WebApp.BackButton.hide();
+        } catch {
+          /* ignore */
+        }
       };
     } catch {
       return () => {};

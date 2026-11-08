@@ -24,13 +24,26 @@ export class ApiError extends Error {
 }
 
 const TIMEOUT_MS = 15000;
+// Purchases wait for Fragment (up to ~60s). Aborting earlier would show an error
+// for an order that may still succeed, and invite the user to pay twice.
+const PURCHASE_TIMEOUT_MS = 70000;
 
-async function request(endpoint, { method = 'GET', body, form } = {}) {
+async function request(endpoint, { method = 'GET', body, form, timeout = TIMEOUT_MS } = {}) {
+  // Outside Telegram (or on a client that sent no initData) the server can only
+  // answer 401 — fail fast with a typed error the UI already knows how to show.
+  let initData = '';
+  try {
+    initData = getInitData() || '';
+  } catch {
+    /* treat as missing */
+  }
+  if (!initData) throw new ApiError('unauthorized');
+
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  const timer = setTimeout(() => controller.abort(), timeout);
 
   try {
-    const headers = { 'X-Telegram-Init-Data': getInitData() };
+    const headers = { 'X-Telegram-Init-Data': initData };
     if (body) headers['Content-Type'] = 'application/json';
 
     const res = await fetch(`${API_URL}${endpoint}`, {
@@ -80,13 +93,54 @@ const demo = {
 
 /* ------------------------------ Public API ------------------------------ */
 
-export const api = {
-  /** { balance, orders, referrals, stars } */
-  getProfile: () => (DEMO_MODE ? demo.getProfile() : request('/user')),
+/** Backend endpoint + body for each order type (see bot/app/api.py). */
+function orderRequest(order) {
+  switch (order.type) {
+    case 'stars':
+      return ['/stars/buy', { username: order.username, quantity: order.quantity, price: order.price }];
+    case 'premium':
+      return ['/premium/buy', { username: order.username, months: order.months, price: order.price }];
+    case 'gift':
+      return ['/gift/buy', {
+        gift_id: order.giftId, recipient: order.username, message: order.message || '', price: order.price,
+      }];
+    default:
+      throw new ApiError('generic', `Unknown order type: ${order.type}`);
+  }
+}
 
-  /** type: "stars" | "premium" | "gift" */
-  createOrder: (order) =>
-    DEMO_MODE ? demo.createOrder(order) : request('/orders', { method: 'POST', body: order }),
+export const api = {
+  /** { balance, orders, referrals, stars } — mapped from POST /user. */
+  getProfile: async () => {
+    if (DEMO_MODE) return demo.getProfile();
+    const { user } = await request('/user', { method: 'POST' });
+    if (!user) throw new ApiError('server');
+    return {
+      balance: user.balance ?? 0,
+      orders: user.total_orders ?? 0,
+      referrals: user.referrals ?? 0,
+      stars: user.stars_balance ?? 0,
+      name: user.name,
+      username: user.username,
+    };
+  },
+
+  /** Last 20 orders, newest first. */
+  getOrders: async () => {
+    if (DEMO_MODE) return [];
+    const { orders } = await request('/orders', { method: 'POST' });
+    return Array.isArray(orders) ? orders : [];
+  },
+
+  /**
+   * type: "stars" | "premium" | "gift". The price is sent only so the server
+   * can refuse if it differs from what the user saw — the server sets the price.
+   */
+  createOrder: (order) => {
+    if (DEMO_MODE) return demo.createOrder(order);
+    const [endpoint, body] = orderRequest(order);
+    return request(endpoint, { method: 'POST', body, timeout: PURCHASE_TIMEOUT_MS });
+  },
 
   /** Sends the top-up amount and the receipt image for admin review. */
   submitDeposit: ({ amount, file }) => {
@@ -94,6 +148,6 @@ export const api = {
     const form = new FormData();
     form.append('amount', String(amount));
     form.append('receipt', file);
-    return request('/deposits', { method: 'POST', form });
+    return request('/receipt', { method: 'POST', form, timeout: 30000 });
   },
 };
