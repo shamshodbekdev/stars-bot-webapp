@@ -4,6 +4,7 @@
  * during development) and on older clients that lack a given feature.
  */
 import WebApp from '@twa-dev/sdk';
+import { canHaptic, triggerHaptic } from '../utils/haptic';
 
 export const tg = WebApp;
 
@@ -79,25 +80,19 @@ export function setTelegramColors(hex) {
   }
 }
 
-/** Haptic feedback helpers. */
+/** Haptic feedback helpers (all no-ops outside Telegram). */
 export const haptic = {
-  impact(style = 'light') {
-    try {
-      if (supports('6.1')) WebApp.HapticFeedback.impactOccurred(style);
-    } catch {
-      /* ignore */
-    }
-  },
+  impact: triggerHaptic,
   notify(type = 'success') {
     try {
-      if (supports('6.1')) WebApp.HapticFeedback.notificationOccurred(type);
+      if (canHaptic()) WebApp.HapticFeedback.notificationOccurred(type);
     } catch {
       /* ignore */
     }
   },
   select() {
     try {
-      if (supports('6.1')) WebApp.HapticFeedback.selectionChanged();
+      if (canHaptic()) WebApp.HapticFeedback.selectionChanged();
     } catch {
       /* ignore */
     }

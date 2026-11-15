@@ -1,4 +1,6 @@
 import { cn } from '../../utils/cn';
+import { triggerHaptic } from '../../utils/haptic';
+import { playClickSound } from '../../utils/sound';
 
 /**
  * Three circular step numbers, evenly spaced. Active step is filled
@@ -17,7 +19,12 @@ export default function StepIndicator({ step, labels = [], onStepClick }) {
               <button
                 type="button"
                 disabled={!canGoBack}
-                onClick={() => canGoBack && onStepClick(s)}
+                onClick={() => {
+                  if (!canGoBack) return;
+                  triggerHaptic();
+                  playClickSound();
+                  onStepClick(s);
+                }}
                 aria-current={active ? 'step' : undefined}
                 className={cn(
                   'grid h-10 w-10 place-items-center rounded-full text-sm font-semibold transition-colors duration-300',

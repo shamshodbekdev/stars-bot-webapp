@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { cn } from '../../utils/cn';
-import { haptic } from '../../lib/telegram';
+import { triggerHaptic } from '../../utils/haptic';
+import { playClickSound } from '../../utils/sound';
 
 /** Visual variants */
 const VARIANTS = {
@@ -40,7 +41,8 @@ export default function Button({
   const isDisabled = disabled || loading;
 
   const handleClick = (e) => {
-    haptic.impact('light');
+    triggerHaptic();
+    playClickSound();
     onClick?.(e);
   };
 

@@ -3,7 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../utils/cn';
-import { haptic } from '../../lib/telegram';
+import { triggerHaptic } from '../../utils/haptic';
+import { playClickSound } from '../../utils/sound';
 
 const ITEMS = [
   { path: '/', icon: Home, key: 'nav.home' },
@@ -36,7 +37,8 @@ export default function BottomNav() {
                   // Ignore taps on the current screen only; sub-pages (e.g.
                   // /settings) still navigate back to their parent tab.
                   if (pathname === path) return;
-                  haptic.select();
+                  triggerHaptic();
+                  playClickSound();
                   navigate(path);
                 }}
                 className={cn(

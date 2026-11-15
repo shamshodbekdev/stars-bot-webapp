@@ -16,6 +16,8 @@ import { GIFTS, CATEGORIES } from '../data/gifts';
 import { cn } from '../utils/cn';
 import { formatSom } from '../utils/format';
 import { haptic } from '../lib/telegram';
+import { triggerHaptic } from '../utils/haptic';
+import { playClickSound } from '../utils/sound';
 
 const MESSAGE_LIMIT = 255;
 
@@ -80,7 +82,8 @@ export default function GiftMarket() {
   // Stable reference so memoized GiftCards don't re-render
   const openGift = useCallback(
     (gift) => {
-      haptic.impact('light');
+      triggerHaptic();
+      playClickSound();
       reset();
       setMessage('');
       setSelected(gift);
@@ -134,7 +137,8 @@ export default function GiftMarket() {
                   key={id}
                   type="button"
                   onClick={() => {
-                    haptic.select();
+                    triggerHaptic();
+                    playClickSound();
                     setCategory(id);
                   }}
                   className={cn(
