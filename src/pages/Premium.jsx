@@ -3,7 +3,8 @@
  * 1. Recipient  2. Duration  3. Confirm
  */
 import { useState } from 'react';
-import { Check, Crown, FileUp, Mic, ShieldOff, Sparkles } from 'lucide-react';
+import { Check, FileUp, Mic, ShieldOff, Sparkles } from 'lucide-react';
+import { PremiumIcon } from '../components/icons/TelegramIcons';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useRecipient } from '../hooks/useRecipient';
 import { usePurchase } from '../hooks/usePurchase';
@@ -70,8 +71,8 @@ export default function Premium() {
             <div className="space-y-4">
               <div className="rounded-2xl border border-line bg-surface p-4">
                 <div className="mb-4 flex items-center gap-3">
-                  <span className="grid h-11 w-11 place-items-center rounded-xl bg-violet-500/10">
-                    <Crown size={22} className="text-violet-500" />
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-violet-500/10">
+                    <PremiumIcon size={32} />
                   </span>
                   <div>
                     <h2 className="font-semibold">Telegram Premium</h2>

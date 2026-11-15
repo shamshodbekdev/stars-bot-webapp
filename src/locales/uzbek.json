@@ -42,7 +42,9 @@
     "recipient": "Qabul qiluvchi",
     "amount": "Miqdor",
     "duration": "Muddat",
-    "confirm": "Tasdiqlash"
+    "confirm": "Tasdiqlash",
+    "payment": "To'lov",
+    "receipt": "Chek"
   },
   "recipient": {
     "self": "O'zimga",
@@ -162,15 +164,21 @@
     "upload": "Chekni yuklash",
     "upload_hint": "Skrinshot yoki rasm, 10 MB gacha",
     "change": "Almashtirish",
-    "receipt_added": "Chek qo'shildi",
     "receipt_removed": "Chek olib tashlandi",
-    "how": {
-      "step1": "Yuqoridagi kartaga summani o'tkazing",
-      "step2": "To'lov chekini (skrinshot) yuklang",
-      "step3": "Admin tekshirgach, balansingiz to'ldiriladi"
-    },
     "submit": "Chekni yuborish",
-    "receipt_sent": "Chek yuborildi. Admin tez orada tekshiradi"
+    "receipt_sent": "Chek yuborildi. Admin tez orada tekshiradi",
+    "amount_title": "Qancha to'ldirmoqchisiz?",
+    "amount_subtitle": "Summani tanlang yoki o'zingiz kiriting",
+    "custom_amount": "Boshqa summa",
+    "to_pay": "To'lanadigan summa",
+    "amount_copied": "Summa nusxalandi",
+    "payment_note": "Aynan shu summani yuqoridagi kartaga o'tkazing, so'ng pastdagi tugmani bosing.",
+    "sent_money": "Men pulni yubordim",
+    "receipt_title": "Chekni yuklang",
+    "receipt_subtitle": "To'lov chekining skrinshotini yuklang",
+    "pending_title": "Kutilmoqda",
+    "pending_text": "To'lovingiz admin tomonidan tekshirilmoqda. Bu odatda 5 daqiqadan 2 soatgacha davom etadi. Iltimos, kuting.",
+    "back_home": "Bosh sahifaga qaytish"
   },
   "profile": {
     "title": "Profil",

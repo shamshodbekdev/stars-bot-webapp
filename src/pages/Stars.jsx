@@ -4,6 +4,7 @@
  */
 import { useState } from 'react';
 import { Star } from 'lucide-react';
+import { StarsIcon } from '../components/icons/TelegramIcons';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useRecipient } from '../hooks/useRecipient';
 import { usePurchase } from '../hooks/usePurchase';
@@ -78,8 +79,8 @@ export default function Stars() {
           {step === 1 && (
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <span className="grid h-11 w-11 place-items-center rounded-xl bg-amber-500/10">
-                  <Star size={22} className="fill-amber-500 text-amber-500" />
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-amber-500/10">
+                  <StarsIcon size={32} />
                 </span>
                 <div>
                   <h2 className="font-semibold">{t('stars_page.hero_title')}</h2>

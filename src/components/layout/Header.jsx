@@ -27,7 +27,7 @@ export default function Header({ title, showBack = true, right }) {
               aria-label={t('common.back')}
               className="grid h-10 w-10 place-items-center rounded-full transition-colors hover:bg-fg/5 active:bg-fg/10"
             >
-              <ChevronLeft size={22} />
+              <ChevronLeft size={28} strokeWidth={2.5} />
             </button>
           )}
         </div>

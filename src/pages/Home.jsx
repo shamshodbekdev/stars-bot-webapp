@@ -4,7 +4,8 @@
  */
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowUpRight, ChevronRight, Crown, Gift, Plus, RefreshCw, Star } from 'lucide-react';
+import { ArrowUpRight, ChevronRight, Plus, RefreshCw } from 'lucide-react';
+import { GiftIcon, PremiumIcon, StarsIcon } from '../components/icons/TelegramIcons';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useUser } from '../contexts/UserContext';
 import Page, { Section } from '../components/layout/Page';
@@ -15,9 +16,9 @@ import Avatar from '../components/ui/Avatar';
 import { formatNumber, formatSom } from '../utils/format';
 
 const SERVICES = [
-  { path: '/premium', icon: Crown, key: 'premium', iconClass: 'text-violet-500', bg: 'bg-violet-500/10' },
-  { path: '/stars', icon: Star, key: 'stars', iconClass: 'text-amber-500 fill-amber-500', bg: 'bg-amber-500/10' },
-  { path: '/gift', icon: Gift, key: 'gift', iconClass: 'text-rose-500', bg: 'bg-rose-500/10' },
+  { path: '/premium', icon: PremiumIcon, key: 'premium', bg: 'bg-violet-500/10' },
+  { path: '/stars', icon: StarsIcon, key: 'stars', bg: 'bg-amber-500/10' },
+  { path: '/gift', icon: GiftIcon, key: 'gift', bg: 'bg-rose-500/10' },
 ];
 
 export default function Home() {
@@ -80,7 +81,7 @@ export default function Home() {
             {t('home.services')}
           </h2>
           <div className="space-y-2">
-            {SERVICES.map(({ path, icon: Icon, key, iconClass, bg }, i) => (
+            {SERVICES.map(({ path, icon: Icon, key, bg }, i) => (
               <motion.div
                 key={path}
                 initial={{ opacity: 0, y: 8 }}
@@ -89,7 +90,7 @@ export default function Home() {
               >
                 <Card onClick={() => navigate(path)} className="flex items-center gap-3">
                   <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${bg}`}>
-                    <Icon size={22} className={iconClass} />
+                    <Icon size={32} />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block font-semibold">{t(`home.services_list.${key}.title`)}</span>
