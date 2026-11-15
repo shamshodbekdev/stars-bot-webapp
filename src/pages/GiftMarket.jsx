@@ -1,8 +1,7 @@
 /**
  * Gift market (accent: rose): search, categories, grid and a purchase sheet.
  */
-import { useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { PackageSearch, Search, Send, Star, X } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useRecipient } from '../hooks/useRecipient';
@@ -19,6 +18,36 @@ import { formatSom } from '../utils/format';
 import { haptic } from '../lib/telegram';
 
 const MESSAGE_LIMIT = 255;
+
+// Per-category counts never change at runtime: compute once at module load.
+const CATEGORY_COUNTS = Object.fromEntries(
+  CATEGORIES.map((id) => [id, id === 'all' ? GIFTS.length : GIFTS.filter((g) => g.category === id).length]),
+);
+
+/**
+ * One grid card. Memoized so that typing in the search box / message field
+ * doesn't re-render every card. Plain <button> with a CSS press effect —
+ * no Framer Motion (its `layout` prop measured every card on each render).
+ */
+const GiftCard = memo(function GiftCard({ gift, name, priceLabel, onOpen }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(gift)}
+      className="rounded-2xl border border-line bg-surface p-3 text-left transition-[transform,border-color] duration-150 hover:border-rose-500/40 active:scale-[0.97]"
+    >
+      <GiftImage src={gift.image} alt={name} className="mb-3 rounded-xl bg-fg/[0.03] p-2" />
+      <p className="truncate text-sm font-semibold">{name}</p>
+      <div className="mt-1 flex items-center justify-between gap-1">
+        <span className="text-sm font-semibold text-rose-500">{priceLabel}</span>
+        <span className="flex items-center gap-0.5 text-xs text-muted">
+          <Star size={11} className="fill-amber-500 text-amber-500" />
+          {gift.stars}
+        </span>
+      </div>
+    </button>
+  );
+});
 
 export default function GiftMarket() {
   const { t } = useLanguage();
@@ -48,12 +77,16 @@ export default function GiftMarket() {
     setSelected(null);
   };
 
-  const openGift = (gift) => {
-    haptic.impact('light');
-    reset();
-    setMessage('');
-    setSelected(gift);
-  };
+  // Stable reference so memoized GiftCards don't re-render
+  const openGift = useCallback(
+    (gift) => {
+      haptic.impact('light');
+      reset();
+      setMessage('');
+      setSelected(gift);
+    },
+    [reset],
+  );
 
   const handleBuy = async () => {
     const username = validate();
@@ -95,7 +128,7 @@ export default function GiftMarket() {
           <div className="flex gap-2">
             {CATEGORIES.map((id) => {
               const active = category === id;
-              const count = id === 'all' ? GIFTS.length : GIFTS.filter((g) => g.category === id).length;
+              const count = CATEGORY_COUNTS[id];
               return (
                 <button
                   key={id}
@@ -126,28 +159,14 @@ export default function GiftMarket() {
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3 pt-1 min-[420px]:grid-cols-3">
-            {gifts.map((gift, i) => (
-              <motion.button
+            {gifts.map((gift) => (
+              <GiftCard
                 key={gift.id}
-                type="button"
-                layout
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2, delay: Math.min(i * 0.03, 0.3) }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => openGift(gift)}
-                className="rounded-2xl border border-line bg-surface p-3 text-left transition-colors hover:border-rose-500/40"
-              >
-                <GiftImage src={gift.image} alt={giftName(gift)} className="mb-3 rounded-xl bg-fg/[0.03] p-2" />
-                <p className="truncate text-sm font-semibold">{giftName(gift)}</p>
-                <div className="mt-1 flex items-center justify-between gap-1">
-                  <span className="text-sm font-semibold text-rose-500">{formatSom(gift.price, som)}</span>
-                  <span className="flex items-center gap-0.5 text-xs text-muted">
-                    <Star size={11} className="fill-amber-500 text-amber-500" />
-                    {gift.stars}
-                  </span>
-                </div>
-              </motion.button>
+                gift={gift}
+                name={giftName(gift)}
+                priceLabel={formatSom(gift.price, som)}
+                onOpen={openGift}
+              />
             ))}
           </div>
         )}
