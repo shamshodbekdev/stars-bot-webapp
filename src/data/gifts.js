@@ -1,19 +1,20 @@
 /**
  * Gift catalogue. Display names and descriptions live in the locale files
- * under `gifts.items.<id>`. Images are served from /gifts on the web root.
+ * under `gifts.items.<id>`. Images are static PNGs (first frame of Telegram's
+ * own Star Gift artwork) served from /icons/gifts on the web root.
  */
 export const GIFTS = [
-  { id: 'bear', image: '/gifts/bear_small.webp', stars: 15, price: 3900, category: 'regular' },
-  { id: 'heart', image: '/gifts/heart_small.webp', stars: 15, price: 3900, category: 'regular' },
-  { id: 'rose', image: '/gifts/rose_small.webp', stars: 25, price: 6500, category: 'regular' },
-  { id: 'gift', image: '/gifts/gift_small.webp', stars: 25, price: 6500, category: 'regular' },
-  { id: 'champagne', image: '/gifts/champagne_small.webp', stars: 50, price: 13000, category: 'regular' },
-  { id: 'rocket', image: '/gifts/rocket_small.webp', stars: 50, price: 13000, category: 'unique' },
-  { id: 'flower', image: '/gifts/flower_small.webp', stars: 50, price: 13000, category: 'regular' },
-  { id: 'cake', image: '/gifts/Cake_small.webp', stars: 50, price: 13000, category: 'regular' },
-  { id: 'diamond', image: '/gifts/diamond_small.webp', stars: 100, price: 26000, category: 'unique' },
-  { id: 'ring', image: '/gifts/ring_small.webp', stars: 100, price: 26000, category: 'unique' },
-  { id: 'cup', image: '/gifts/cubic_small.webp', stars: 100, price: 26000, category: 'unique' },
+  { id: 'bear', image: '/icons/gifts/bear.png', stars: 15, price: 3900, category: 'regular' },
+  { id: 'heart', image: '/icons/gifts/heart.png', stars: 15, price: 3900, category: 'regular' },
+  { id: 'rose', image: '/icons/gifts/rose.png', stars: 25, price: 6500, category: 'regular' },
+  { id: 'gift', image: '/icons/gifts/gift.png', stars: 25, price: 6500, category: 'regular' },
+  { id: 'champagne', image: '/icons/gifts/champagne.png', stars: 50, price: 13000, category: 'regular' },
+  { id: 'rocket', image: '/icons/gifts/rocket.png', stars: 50, price: 13000, category: 'unique' },
+  { id: 'flower', image: '/icons/gifts/flower.png', stars: 50, price: 13000, category: 'regular' },
+  { id: 'cake', image: '/icons/gifts/cake.png', stars: 50, price: 13000, category: 'regular' },
+  { id: 'diamond', image: '/icons/gifts/diamond.png', stars: 100, price: 26000, category: 'unique' },
+  { id: 'ring', image: '/icons/gifts/ring.png', stars: 100, price: 26000, category: 'unique' },
+  { id: 'cup', image: '/icons/gifts/cup.png', stars: 100, price: 26000, category: 'unique' },
 ];
 
 /** Category ids; labels are in locales under `gifts.categories.<id>`. */
