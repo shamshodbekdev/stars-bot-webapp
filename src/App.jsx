@@ -5,6 +5,7 @@ import { backButton } from './lib/telegram';
 import { useGoBack } from './components/layout/Header';
 import LanguageSelector from './components/LanguageSelector';
 import BottomNav from './components/layout/BottomNav';
+import OrderPending from './components/order/OrderPending';
 import Home from './pages/Home';
 import Stars from './pages/Stars';
 import Premium from './pages/Premium';
@@ -75,6 +76,7 @@ export default function App() {
       <TelegramBackButton />
       <AppRoutes />
       <BottomNav />
+      <OrderPending />
     </HashRouter>
   );
 }

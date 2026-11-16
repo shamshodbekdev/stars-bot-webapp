@@ -6,6 +6,8 @@ import { PackageSearch, Search, Send, Star, X } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useRecipient } from '../hooks/useRecipient';
 import { usePurchase } from '../hooks/usePurchase';
+import { useShopConfig } from '../hooks/useShopConfig';
+import { DiscountBadge, PriceTag } from '../components/order/Price';
 import Page, { Section } from '../components/layout/Page';
 import Header from '../components/layout/Header';
 import BottomSheet from '../components/ui/BottomSheet';
@@ -31,7 +33,7 @@ const CATEGORY_COUNTS = Object.fromEntries(
  * doesn't re-render every card. Plain <button> with a CSS press effect —
  * no Framer Motion (its `layout` prop measured every card on each render).
  */
-const GiftCard = memo(function GiftCard({ gift, name, priceLabel, onOpen }) {
+const GiftCard = memo(function GiftCard({ gift, name, priceLabel, basePriceLabel, onOpen }) {
   return (
     <button
       type="button"
@@ -40,7 +42,8 @@ const GiftCard = memo(function GiftCard({ gift, name, priceLabel, onOpen }) {
     >
       <GiftImage src={gift.image} alt={name} className="mb-3 rounded-xl bg-fg/[0.03] p-2" />
       <p className="truncate text-sm font-semibold">{name}</p>
-      <div className="mt-1 flex items-center justify-between gap-1">
+      {basePriceLabel && <s className="mt-1 block text-[11px] text-muted">{basePriceLabel}</s>}
+      <div className={basePriceLabel ? 'flex items-center justify-between gap-1' : 'mt-1 flex items-center justify-between gap-1'}>
         <span className="text-sm font-semibold text-rose-500">{priceLabel}</span>
         <span className="flex items-center gap-0.5 text-xs text-muted">
           <Star size={11} className="fill-amber-500 text-amber-500" />
@@ -55,6 +58,10 @@ export default function GiftMarket() {
   const { t } = useLanguage();
   const { recipient, setRecipient, error: recipientError, validate, reset } = useRecipient();
   const { purchase, loading } = usePurchase();
+  const { giftPrices, discounts, ready: pricesReady } = useShopConfig();
+  const discount = discounts.gifts || 0;
+  // Live (admin-set) price of a gift; static catalogue price until /api/config answers.
+  const priceOf = useCallback((gift) => giftPrices[gift.id] || { price: gift.price, basePrice: gift.price }, [giftPrices]);
 
   const [category, setCategory] = useState('all');
   const [query, setQuery] = useState('');
@@ -99,7 +106,7 @@ export default function GiftMarket() {
       giftId: selected.id,
       username,
       message: message.trim(),
-      price: selected.price,
+      price: priceOf(selected).price,
     });
     if (ok) setSelected(null);
   };
@@ -168,7 +175,8 @@ export default function GiftMarket() {
                 key={gift.id}
                 gift={gift}
                 name={giftName(gift)}
-                priceLabel={formatSom(gift.price, som)}
+                priceLabel={formatSom(priceOf(gift).price, som)}
+                basePriceLabel={priceOf(gift).basePrice > priceOf(gift).price ? formatSom(priceOf(gift).basePrice, som) : null}
                 onOpen={openGift}
               />
             ))}
@@ -189,7 +197,10 @@ export default function GiftMarket() {
               />
               <div className="min-w-0">
                 <p className="text-sm text-muted">{t(`gifts.items.${selected.id}.desc`)}</p>
-                <p className="mt-1 text-2xl font-semibold tracking-tight">{formatSom(selected.price, som)}</p>
+                <p className="mt-1 flex flex-wrap items-center gap-2 text-2xl font-semibold tracking-tight">
+                  <PriceTag price={priceOf(selected).price} basePrice={priceOf(selected).basePrice} som={som} />
+                  {discount > 0 && <DiscountBadge percent={discount} />}
+                </p>
                 <p className="mt-0.5 flex items-center gap-1 text-xs text-muted">
                   <Star size={12} className="fill-amber-500 text-amber-500" />
                   {t('gift_page.stars_value', { n: selected.stars })}
@@ -225,8 +236,10 @@ export default function GiftMarket() {
               </p>
             </div>
 
-            <Button fullWidth size="lg" icon={Send} loading={loading} onClick={handleBuy}>
-              {t('gift_page.send', { price: formatSom(selected.price, som) })}
+            <p className="text-xs text-muted">{t('order.delivery_note')}</p>
+
+            <Button fullWidth size="lg" icon={Send} loading={loading} disabled={!pricesReady} onClick={handleBuy}>
+              {t('gift_page.send', { price: formatSom(priceOf(selected).price, som) })}
             </Button>
           </div>
         )}

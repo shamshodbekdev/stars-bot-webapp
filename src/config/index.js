@@ -26,7 +26,7 @@ export const STARS = {
 
 /**
  * Telegram Premium plans. `bonus` is the saving in percent.
- * Fragment can only gift 3, 6 or 12 months. `price` / `bonus` are demo fallbacks:
+ * Premium is sold for 3, 6 or 12 months. `price` / `bonus` are demo fallbacks:
  * live prices and the real saving come from GET /api/config (hooks/useShopConfig.js).
  */
 export const PREMIUM_PLANS = [

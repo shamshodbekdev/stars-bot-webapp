@@ -61,7 +61,9 @@
     "price_per_unit": "1 dona narxi",
     "your_balance": "Balansingiz",
     "total": "Jami",
-    "delivery_note": "To'lov balansdan yechiladi. Buyurtma odatda bir necha daqiqada bajariladi."
+    "delivery_note": "To'lov balansdan yechiladi. Buyurtma 5 daqiqa ichida yuboriladi.",
+    "discount": "Chegirma",
+    "discount_badge": "−{percent}%"
   },
   "stars_page": {
     "title": "Stars sotib olish",
@@ -232,6 +234,22 @@
   "toast": {
     "order_created": "Buyurtma qabul qilindi"
   },
+  "pending": {
+    "title_pending": "Buyurtmangiz qabul qilindi!",
+    "text_pending": "5 daqiqa ichida yuboriladi. Kuting...",
+    "badge": "Yuborilmoqda",
+    "title_late": "Buyurtma kechikdi",
+    "text_late": "Iltimos, qo'llab-quvvatlashga murojaat qiling.",
+    "title_completed": "Buyurtmangiz bajarildi!",
+    "text_completed": "Rahmat! Buyurtma qabul qiluvchiga yuborildi.",
+    "title_refunded": "Buyurtma bekor qilindi",
+    "text_refunded": "Mablag' balansingizga qaytarildi.",
+    "order_no": "Buyurtma",
+    "bot_note": "Natija haqida bot orqali ham xabar beramiz.",
+    "contact_support": "Qo'llab-quvvatlashga yozish",
+    "close_wait": "Yopish (bot xabar beradi)",
+    "done": "Tayyor"
+  },
   "validation": {
     "username_required": "Username kiriting",
     "username_invalid": "Username noto'g'ri: 5–32 ta lotin harfi, raqam yoki _",
@@ -247,20 +265,18 @@
     "timeout": "Server javob bermadi. Qayta urinib ko'ring",
     "server": "Serverda xatolik. Keyinroq urinib ko'ring",
     "insufficient_balance": "Balans yetarli emas. Avval balansni to'ldiring",
-    "fragment_error": "Buyurtma bajarilmadi, pul balansingizga qaytarildi",
     "busy": "Oldingi buyurtma hali bajarilmoqda, biroz kuting",
     "price_changed": "Narx yangilandi. Yangi narxni tekshirib, qayta tasdiqlang",
     "pricing_unavailable": "Narxlar vaqtincha mavjud emas. Birozdan so'ng urinib ko'ring",
     "unauthorized": "Ilovani Telegram ichidan qayta oching",
     "banned": "Hisobingiz bloklangan",
     "invalid_username": "Username noto'g'ri",
-    "username_not_found": "Bu username Fragment'da topilmadi. Iltimos, to'g'ri username kiriting.",
-    "username_check_unavailable": "Username tekshiruvi vaqtincha ishlamayapti. Birozdan so'ng urinib ko'ring",
     "invalid_amount": "Summa noto'g'ri",
     "cards_busy": "Hozir barcha kartalar band. Bir necha daqiqadan so'ng urinib ko'ring",
     "NO_FREE_CARDS": "Hozircha to'lov uchun bo'sh karta yo'q. Iltimos, 5 daqiqadan keyin qayta urinib ko'ring yoki boshqa summa kiriting.",
     "payments_unavailable": "Avtomatik to'lov vaqtincha ishlamayapti. Keyinroq urinib ko'ring",
-    "not_found": "To'lov topilmadi"
+    "not_found": "To'lov topilmadi",
+    "order_not_found": "Buyurtma topilmadi"
   },
   "common": {
     "back": "Orqaga",

@@ -1,7 +1,8 @@
 /**
  * Gift catalogue. Display names and descriptions live in the locale files
  * under `gifts.items.<id>`. Images are static PNGs (first frame of Telegram's
- * own Star Gift artwork) served from /icons/gifts on the web root.
+ * own Star Gift artwork) served from /icons/gifts on the web root. `price` is a
+ * fallback only: live prices (admin-set, with discount) come from GET /api/config.
  */
 export const GIFTS = [
   { id: 'bear', image: '/icons/gifts/bear.png', stars: 15, price: 3900, category: 'regular' },

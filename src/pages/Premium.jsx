@@ -17,6 +17,7 @@ import StepTransition from '../components/ui/StepTransition';
 import RecipientField from '../components/order/RecipientField';
 import { Summary, SummaryRow } from '../components/order/Summary';
 import BalanceRow from '../components/order/BalanceRow';
+import { DiscountBadge, PriceTag } from '../components/order/Price';
 import { cn } from '../utils/cn';
 import { formatSom } from '../utils/format';
 import { haptic } from '../lib/telegram';
@@ -35,7 +36,8 @@ export default function Premium() {
 
   const [step, setStep] = useState(1);
   const [username, setUsername] = useState('');
-  const { premiumPlans, ready: pricesReady } = useShopConfig();
+  const { premiumPlans, discounts, ready: pricesReady } = useShopConfig();
+  const discount = discounts.premium || 0;
   const [planMonths, setPlanMonths] = useState(6);
   // Always the current server price for the chosen duration.
   const plan = premiumPlans.find((p) => p.months === planMonths)
@@ -78,10 +80,11 @@ export default function Premium() {
                   <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-violet-500/10">
                     <PremiumIcon size={32} />
                   </span>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <h2 className="font-semibold">Telegram Premium</h2>
                     <p className="text-sm text-muted">{t('premium_page.hero_subtitle')}</p>
                   </div>
+                  {discount > 0 && <DiscountBadge percent={discount} />}
                 </div>
                 <ul className="grid grid-cols-1 gap-y-2.5 min-[400px]:grid-cols-2 min-[400px]:gap-x-3">
                   {FEATURES.map(({ icon: Icon, key }) => (
@@ -150,6 +153,9 @@ export default function Premium() {
                         )}
                       </span>
                       <span className="text-right">
+                        {p.basePrice > p.price && (
+                          <span className="block text-[11px] text-muted line-through">{formatSom(p.basePrice, som)}</span>
+                        )}
                         <span className="block font-semibold">{formatSom(p.price, som)}</span>
                         {p.months > 1 && (
                           <span className="block text-[11px] text-muted">
@@ -182,8 +188,15 @@ export default function Premium() {
                 <SummaryRow label={t('order.recipient')} value={display} />
                 <SummaryRow label={t('order.product')} value="Telegram Premium" />
                 <SummaryRow label={t('order.duration')} value={months(plan.months)} />
+                {discount > 0 && (
+                  <SummaryRow label={t('order.discount')} value={<DiscountBadge percent={discount} />} />
+                )}
                 <BalanceRow price={plan.price} />
-                <SummaryRow label={t('order.total')} value={formatSom(plan.price, som)} strong />
+                <SummaryRow
+                  label={t('order.total')}
+                  value={<PriceTag price={plan.price} basePrice={plan.basePrice} som={som} />}
+                  strong
+                />
               </Summary>
               <p className="px-1 text-xs text-muted">{t('order.delivery_note')}</p>
 

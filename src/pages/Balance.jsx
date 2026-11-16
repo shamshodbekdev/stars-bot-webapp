@@ -24,7 +24,8 @@ import { copyToClipboard } from '../utils/clipboard';
 import { digitsOnly, formatNumber, formatSom } from '../utils/format';
 import { cn } from '../utils/cn';
 import { haptic } from '../lib/telegram';
-import { MIN_DEPOSIT, PAYMENT_POLL_INTERVAL } from '../config';
+import { PAYMENT_POLL_INTERVAL } from '../config';
+import { useShopConfig } from '../hooks/useShopConfig';
 
 const PRESETS = [10000, 25000, 50000, 100000, 200000];
 const MAX_DEPOSIT_DIGITS = 9;
@@ -40,6 +41,8 @@ function formatTimer(seconds) {
 
 export default function Balance() {
   const { t } = useLanguage();
+  // Minimum top-up comes from the server (GET /api/config)
+  const { minDeposit: MIN_DEPOSIT } = useShopConfig();
   const { refresh } = useUser();
   const { showToast } = useToast();
   const errorMessage = useApiError();

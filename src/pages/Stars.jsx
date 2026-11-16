@@ -18,56 +18,32 @@ import StepTransition from '../components/ui/StepTransition';
 import RecipientField from '../components/order/RecipientField';
 import { Summary, SummaryRow } from '../components/order/Summary';
 import BalanceRow from '../components/order/BalanceRow';
+import { DiscountBadge, PriceTag } from '../components/order/Price';
 import { STARS } from '../config';
 import { cn } from '../utils/cn';
 import { digitsOnly, formatNumber, formatSom } from '../utils/format';
 import { haptic } from '../lib/telegram';
-import { api } from '../utils/api';
-import { useToast } from '../components/ui/Toast';
-import { useApiError } from '../hooks/useApiError';
 
 export default function Stars() {
   const { t } = useLanguage();
   const { recipient, setRecipient, error: recipientError, validate, reset, display } = useRecipient();
   const { purchase, loading } = usePurchase();
-  const { pricePerStar, ready: pricesReady } = useShopConfig();
+  const { pricePerStar, starsBasePrice, discounts, ready: pricesReady } = useShopConfig();
+  const discount = discounts.stars || 0;
 
   const [step, setStep] = useState(1);
   const [username, setUsername] = useState('');
   const [amount, setAmount] = useState(String(STARS.presets[1]));
   const [amountError, setAmountError] = useState('');
-  const [checking, setChecking] = useState(false);
-  const { showToast } = useToast();
-  const errorMessage = useApiError();
 
   const quantity = Number(amount) || 0;
   const total = quantity * pricePerStar;
   const som = t('common.som');
 
-  // Step 1 -> 2 (another user's username must exist on Fragment)
-  const handleRecipientNext = async () => {
-    if (checking) return;
+  // Step 1 -> 2 (username format is checked locally)
+  const handleRecipientNext = () => {
     const name = validate();
     if (!name) return haptic.notify('error');
-
-    if (recipient.mode !== 'self') {
-      setChecking(true);
-      try {
-        const { exists } = await api.checkUsername(name);
-        if (!exists) {
-          haptic.notify('error');
-          showToast(t('errors.username_not_found'), 'error');
-          return;
-        }
-      } catch (err) {
-        haptic.notify('error');
-        showToast(errorMessage(err), 'error');
-        return;
-      } finally {
-        setChecking(false);
-      }
-    }
-
     setUsername(name);
     setStep(2);
   };
@@ -110,10 +86,11 @@ export default function Stars() {
                 <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-amber-500/10">
                   <StarsIcon size={32} />
                 </span>
-                <div>
+                <div className="min-w-0 flex-1">
                   <h2 className="font-semibold">{t('stars_page.hero_title')}</h2>
                   <p className="text-sm text-muted">{t('stars_page.hero_subtitle')}</p>
                 </div>
+                {discount > 0 && <DiscountBadge percent={discount} />}
               </div>
               <RecipientField
                 layoutId="stars-recipient"
@@ -121,7 +98,7 @@ export default function Stars() {
                 onChange={setRecipient}
                 error={recipientError}
               />
-              <Button fullWidth size="lg" loading={checking} onClick={handleRecipientNext}>
+              <Button fullWidth size="lg" onClick={handleRecipientNext}>
                 {t('common.next')}
               </Button>
             </div>
@@ -201,9 +178,19 @@ export default function Stars() {
                   label={t('order.quantity')}
                   value={`${formatNumber(quantity)} ${t('stars_page.stars')}`}
                 />
-                <SummaryRow label={t('order.price_per_unit')} value={formatSom(pricePerStar, som)} />
+                <SummaryRow
+                  label={t('order.price_per_unit')}
+                  value={<PriceTag price={pricePerStar} basePrice={starsBasePrice} som={som} />}
+                />
+                {discount > 0 && (
+                  <SummaryRow label={t('order.discount')} value={<DiscountBadge percent={discount} />} />
+                )}
                 <BalanceRow price={total} />
-                <SummaryRow label={t('order.total')} value={formatSom(total, som)} strong />
+                <SummaryRow
+                  label={t('order.total')}
+                  value={<PriceTag price={total} basePrice={quantity * starsBasePrice} som={som} />}
+                  strong
+                />
               </Summary>
               <p className="px-1 text-xs text-muted">{t('order.delivery_note')}</p>
 

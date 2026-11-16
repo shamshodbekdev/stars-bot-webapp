@@ -24,9 +24,6 @@ export class ApiError extends Error {
 }
 
 const TIMEOUT_MS = 15000;
-// Purchases wait for Fragment (up to ~60s). Aborting earlier would show an error
-// for an order that may still succeed, and invite the user to pay twice.
-const PURCHASE_TIMEOUT_MS = 70000;
 
 async function request(endpoint, { method = 'GET', body, form, timeout = TIMEOUT_MS } = {}) {
   // Outside Telegram (or on a client that sent no initData) the server can only
@@ -76,13 +73,38 @@ const demo = {
     return { ...this.profile };
   },
 
-  /** Purchases are charged from the balance, like the real backend would. */
-  async createOrder({ price }) {
+  /** Purchases are charged from the balance; an "admin" completes them after ~15 s. */
+  orders: {},
+
+  async createOrder(order) {
     await wait(900);
-    if (this.profile.balance < price) throw new ApiError('insufficient_balance');
-    this.profile.balance -= price;
-    this.profile.orders += 1;
-    return { id: Date.now(), status: 'pending' };
+    if (this.profile.balance < order.price) throw new ApiError('insufficient_balance');
+    this.profile.balance -= order.price;
+    const created = {
+      id: Date.now(),
+      type: order.type,
+      status: 'pending',
+      target_username: order.username,
+      quantity: order.quantity ?? order.months ?? 1,
+      months: order.months ?? null,
+      gift_id: order.giftId ?? null,
+      price: order.price,
+      createdAt: Date.now(),
+    };
+    this.orders[created.id] = created;
+    return { status: 'pending', order: { ...created, eta_seconds: 300 } };
+  },
+
+  async orderStatus({ orderId }) {
+    await wait(300);
+    const o = this.orders[orderId];
+    if (!o) throw new ApiError('order_not_found');
+    if (o.status === 'pending' && Date.now() - o.createdAt > 15000) {
+      o.status = 'completed';
+      this.profile.orders += 1;
+    }
+    const eta = o.status === 'pending' ? Math.max(0, 300 - Math.floor((Date.now() - o.createdAt) / 1000)) : 0;
+    return { order: { ...o, eta_seconds: eta }, balance: this.profile.balance };
   },
 
   /** Fake automatic top-up: "paid" ~8 s after the user presses "I have sent". */
@@ -163,23 +185,22 @@ export const api = {
     return Array.isArray(orders) ? orders : [];
   },
 
-  /** { exists: boolean } — whether Fragment knows this username (can receive Stars). */
-  checkUsername: async (username) => {
-    if (DEMO_MODE) {
-      await wait(300);
-      return { exists: true };
-    }
-    return request('/check-username', { method: 'POST', body: { username } });
-  },
-
   /**
    * type: "stars" | "premium" | "gift". The price is sent only so the server
    * can refuse if it differs from what the user saw — the server sets the price.
+   * Resolves to { status: "pending", order: { id, status, eta_seconds, ... } }:
+   * the balance is charged and an admin delivers the order within ~5 minutes.
    */
   createOrder: (order) => {
     if (DEMO_MODE) return demo.createOrder(order);
     const [endpoint, body] = orderRequest(order);
-    return request(endpoint, { method: 'POST', body, timeout: PURCHASE_TIMEOUT_MS });
+    return request(endpoint, { method: 'POST', body });
+  },
+
+  /** { order: { status: "pending" | "completed" | "refunded", eta_seconds, ... }, balance } */
+  orderStatus: ({ orderId }) => {
+    if (DEMO_MODE) return demo.orderStatus({ orderId });
+    return request('/order/status', { method: 'POST', body: { order_id: orderId } });
   },
 
   /**
