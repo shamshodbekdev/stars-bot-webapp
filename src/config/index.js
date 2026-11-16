@@ -8,9 +8,9 @@ export const API_URL = import.meta.env.VITE_API_URL || '';
 
 /** Support links. */
 export const LINKS = {
-  supportChat: 'https://t.me/starsrkhim_chat',
-  admin: 'https://t.me/starsrkhim_admin',
-  adminUsername: '@starsrkhim_admin',
+  supportChat: 'https://t.me/own_premium_chat',
+  admin: 'https://t.me/own_premium_admin',
+  adminUsername: '@own_premium_admin',
 };
 
 export const APP_VERSION = '1.1.0';
