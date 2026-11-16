@@ -1,6 +1,6 @@
 /**
  * Toast notifications: success | error | info | warning.
- * Usage: const { showToast } = useToast(); showToast(text, 'success');
+ * Usage: const { showToast } = useToast(); showToast(text, 'success'[, durationMs]);
  */
 import { createContext, useCallback, useContext, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -28,12 +28,12 @@ export function ToastProvider({ children }) {
   }, []);
 
   const showToast = useCallback(
-    (message, type = 'info') => {
+    (message, type = 'info', duration = DURATION) => {
       const id = ++nextId.current;
       const config = TYPES[type] ? type : 'info';
       if (TYPES[config].haptic) haptic.notify(TYPES[config].haptic);
       setToasts((list) => [...list, { id, message, type: config }].slice(-MAX_VISIBLE));
-      setTimeout(() => dismiss(id), DURATION);
+      setTimeout(() => dismiss(id), duration);
     },
     [dismiss],
   );

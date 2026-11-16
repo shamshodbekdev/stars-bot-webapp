@@ -8,6 +8,7 @@ import { PremiumIcon } from '../components/icons/TelegramIcons';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useRecipient } from '../hooks/useRecipient';
 import { usePurchase } from '../hooks/usePurchase';
+import { useShopConfig } from '../hooks/useShopConfig';
 import Page, { Section } from '../components/layout/Page';
 import Header from '../components/layout/Header';
 import Button from '../components/ui/Button';
@@ -16,7 +17,6 @@ import StepTransition from '../components/ui/StepTransition';
 import RecipientField from '../components/order/RecipientField';
 import { Summary, SummaryRow } from '../components/order/Summary';
 import BalanceRow from '../components/order/BalanceRow';
-import { PREMIUM_PLANS } from '../config';
 import { cn } from '../utils/cn';
 import { formatSom } from '../utils/format';
 import { haptic } from '../lib/telegram';
@@ -35,7 +35,11 @@ export default function Premium() {
 
   const [step, setStep] = useState(1);
   const [username, setUsername] = useState('');
-  const [plan, setPlan] = useState(PREMIUM_PLANS.find((p) => p.popular) || PREMIUM_PLANS[0]);
+  const { premiumPlans, ready: pricesReady } = useShopConfig();
+  const [planMonths, setPlanMonths] = useState(6);
+  // Always the current server price for the chosen duration.
+  const plan = premiumPlans.find((p) => p.months === planMonths)
+    || premiumPlans.find((p) => p.popular) || premiumPlans[0];
 
   const som = t('common.som');
   const months = (n) => t('premium_page.months_count', { n });
@@ -105,7 +109,7 @@ export default function Premium() {
           {step === 2 && (
             <div className="space-y-4">
               <div className="space-y-2" role="radiogroup">
-                {PREMIUM_PLANS.map((p) => {
+                {premiumPlans.map((p) => {
                   const active = plan.months === p.months;
                   return (
                     <button
@@ -115,7 +119,7 @@ export default function Premium() {
                       aria-checked={active}
                       onClick={() => {
                         haptic.select();
-                        setPlan(p);
+                        setPlanMonths(p.months);
                       }}
                       className={cn(
                         'flex w-full items-center gap-3 rounded-xl border p-4 text-left transition-colors',
@@ -193,7 +197,7 @@ export default function Premium() {
                 >
                   {t('common.back')}
                 </Button>
-                <Button size="lg" className="flex-1" loading={loading} onClick={handleConfirm}>
+                <Button size="lg" className="flex-1" loading={loading} disabled={!pricesReady} onClick={handleConfirm}>
                   {t('common.confirm')}
                 </Button>
               </div>

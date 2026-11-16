@@ -5,6 +5,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useUser } from '../contexts/UserContext';
 import { useToast } from '../components/ui/Toast';
 import { useApiError } from './useApiError';
+import { loadShopConfig } from './useShopConfig';
 
 /**
  * Creates an order and handles the common outcomes:
@@ -33,6 +34,8 @@ export function usePurchase() {
           showToast(t('errors.insufficient_balance'), 'warning');
           navigate('/balance');
         } else {
+          // Prices moved since the page was opened: show the new ones.
+          if (err.code === 'price_changed') loadShopConfig({ force: true });
           showToast(errorMessage(err), 'error');
         }
         return false;

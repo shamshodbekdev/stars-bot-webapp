@@ -8,6 +8,7 @@ import { StarsIcon } from '../components/icons/TelegramIcons';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useRecipient } from '../hooks/useRecipient';
 import { usePurchase } from '../hooks/usePurchase';
+import { useShopConfig } from '../hooks/useShopConfig';
 import Page, { Section } from '../components/layout/Page';
 import Header from '../components/layout/Header';
 import Button from '../components/ui/Button';
@@ -21,25 +22,52 @@ import { STARS } from '../config';
 import { cn } from '../utils/cn';
 import { digitsOnly, formatNumber, formatSom } from '../utils/format';
 import { haptic } from '../lib/telegram';
+import { api } from '../utils/api';
+import { useToast } from '../components/ui/Toast';
+import { useApiError } from '../hooks/useApiError';
 
 export default function Stars() {
   const { t } = useLanguage();
   const { recipient, setRecipient, error: recipientError, validate, reset, display } = useRecipient();
   const { purchase, loading } = usePurchase();
+  const { pricePerStar, ready: pricesReady } = useShopConfig();
 
   const [step, setStep] = useState(1);
   const [username, setUsername] = useState('');
   const [amount, setAmount] = useState(String(STARS.presets[1]));
   const [amountError, setAmountError] = useState('');
+  const [checking, setChecking] = useState(false);
+  const { showToast } = useToast();
+  const errorMessage = useApiError();
 
   const quantity = Number(amount) || 0;
-  const total = quantity * STARS.pricePerStar;
+  const total = quantity * pricePerStar;
   const som = t('common.som');
 
-  // Step 1 -> 2
-  const handleRecipientNext = () => {
+  // Step 1 -> 2 (another user's username must exist on Fragment)
+  const handleRecipientNext = async () => {
+    if (checking) return;
     const name = validate();
     if (!name) return haptic.notify('error');
+
+    if (recipient.mode !== 'self') {
+      setChecking(true);
+      try {
+        const { exists } = await api.checkUsername(name);
+        if (!exists) {
+          haptic.notify('error');
+          showToast(t('errors.username_not_found'), 'error');
+          return;
+        }
+      } catch (err) {
+        haptic.notify('error');
+        showToast(errorMessage(err), 'error');
+        return;
+      } finally {
+        setChecking(false);
+      }
+    }
+
     setUsername(name);
     setStep(2);
   };
@@ -93,7 +121,7 @@ export default function Stars() {
                 onChange={setRecipient}
                 error={recipientError}
               />
-              <Button fullWidth size="lg" onClick={handleRecipientNext}>
+              <Button fullWidth size="lg" loading={checking} onClick={handleRecipientNext}>
                 {t('common.next')}
               </Button>
             </div>
@@ -126,7 +154,7 @@ export default function Stars() {
                         {formatNumber(preset)}
                       </span>
                       <span className="mt-0.5 text-[11px] text-muted">
-                        {formatSom(preset * STARS.pricePerStar, som)}
+                        {formatSom(preset * pricePerStar, som)}
                       </span>
                     </button>
                   );
@@ -145,7 +173,7 @@ export default function Stars() {
                 }}
                 suffix={t('stars_page.stars')}
                 error={amountError}
-                hint={t('stars_page.amount_hint', { min: STARS.min, price: STARS.pricePerStar })}
+                hint={t('stars_page.amount_hint', { min: STARS.min, price: pricePerStar })}
               />
 
               <div className="flex items-center justify-between rounded-xl bg-fg/[0.04] px-4 py-3">
@@ -173,7 +201,7 @@ export default function Stars() {
                   label={t('order.quantity')}
                   value={`${formatNumber(quantity)} ${t('stars_page.stars')}`}
                 />
-                <SummaryRow label={t('order.price_per_unit')} value={formatSom(STARS.pricePerStar, som)} />
+                <SummaryRow label={t('order.price_per_unit')} value={formatSom(pricePerStar, som)} />
                 <BalanceRow price={total} />
                 <SummaryRow label={t('order.total')} value={formatSom(total, som)} strong />
               </Summary>
@@ -189,7 +217,7 @@ export default function Stars() {
                 >
                   {t('common.back')}
                 </Button>
-                <Button size="lg" className="flex-1" loading={loading} onClick={handleConfirm}>
+                <Button size="lg" className="flex-1" loading={loading} disabled={!pricesReady} onClick={handleConfirm}>
                   {t('common.confirm')}
                 </Button>
               </div>

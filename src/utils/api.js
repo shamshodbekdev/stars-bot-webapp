@@ -85,9 +85,40 @@ const demo = {
     return { id: Date.now(), status: 'pending' };
   },
 
-  async submitDeposit() {
-    await wait(1200);
-    return { id: Date.now(), status: 'review' };
+  /** Fake automatic top-up: "paid" ~8 s after the user presses "I have sent". */
+  payments: {},
+
+  async createAutoPayment({ amount }) {
+    await wait(700);
+    const payment = {
+      payment_id: Date.now(),
+      status: 'pending',
+      amount,
+      unique_amount: amount,
+      card_number: '9860 0000 0000 0000',
+      card_holder: 'DEMO',
+      expires_in: 600,
+      createdAt: Date.now(),
+    };
+    this.payments[payment.payment_id] = payment;
+    return { ...payment };
+  },
+
+  async autoPaymentStatus({ paymentId }) {
+    await wait(300);
+    const p = this.payments[paymentId];
+    if (!p) throw new ApiError('not_found');
+    if (p.status === 'pending' && Date.now() - p.createdAt > 8000) {
+      p.status = 'paid';
+      this.profile.balance += p.unique_amount;
+    }
+    return { ...p, credited_amount: p.status === 'paid' ? p.unique_amount : null, balance: this.profile.balance };
+  },
+
+  async cancelAutoPayment({ paymentId }) {
+    const p = this.payments[paymentId];
+    if (p && p.status === 'pending') p.status = 'cancelled';
+    return { status: p ? p.status : 'cancelled' };
   },
 };
 
@@ -132,6 +163,15 @@ export const api = {
     return Array.isArray(orders) ? orders : [];
   },
 
+  /** { exists: boolean } — whether Fragment knows this username (can receive Stars). */
+  checkUsername: async (username) => {
+    if (DEMO_MODE) {
+      await wait(300);
+      return { exists: true };
+    }
+    return request('/check-username', { method: 'POST', body: { username } });
+  },
+
   /**
    * type: "stars" | "premium" | "gift". The price is sent only so the server
    * can refuse if it differs from what the user saw — the server sets the price.
@@ -142,12 +182,27 @@ export const api = {
     return request(endpoint, { method: 'POST', body, timeout: PURCHASE_TIMEOUT_MS });
   },
 
-  /** Sends the top-up amount and the receipt image for admin review. */
-  submitDeposit: ({ amount, file }) => {
-    if (DEMO_MODE) return demo.submitDeposit();
-    const form = new FormData();
-    form.append('amount', String(amount));
-    form.append('receipt', file);
-    return request('/receipt', { method: 'POST', form, timeout: 30000 });
+  /**
+   * Starts an automatic top-up. The server reserves one of the payment cards
+   * and returns { payment_id, card_number, card_holder, amount,
+   * expires_in, status }. The user transfers exactly `amount`; the server
+   * confirms it by itself (no receipt). Fails with NO_FREE_CARDS when every
+   * card already holds someone's pending payment.
+   */
+  createAutoPayment: ({ amount }) => {
+    if (DEMO_MODE) return demo.createAutoPayment({ amount });
+    return request('/auto-payment', { method: 'POST', body: { amount } });
+  },
+
+  /** { status: "pending" | "paid" | "expired" | "cancelled", balance? (when paid), ... } */
+  autoPaymentStatus: ({ paymentId }) => {
+    if (DEMO_MODE) return demo.autoPaymentStatus({ paymentId });
+    return request('/auto-payment/status', { method: 'POST', body: { payment_id: paymentId } });
+  },
+
+  /** Frees the card when the user goes back before paying. */
+  cancelAutoPayment: ({ paymentId }) => {
+    if (DEMO_MODE) return demo.cancelAutoPayment({ paymentId });
+    return request('/auto-payment/cancel', { method: 'POST', body: { payment_id: paymentId } });
   },
 };
