@@ -17,11 +17,19 @@ import { getInitData } from '../lib/telegram';
 export const DEMO_MODE = !API_URL;
 
 export class ApiError extends Error {
-  constructor(code, message) {
+  constructor(code, message, extra = {}) {
     super(message || code);
     this.code = code;
+    Object.assign(this, extra);
   }
 }
+
+/**
+ * Fired on `window` whenever the server answers 403 not_subscribed (force
+ * subscribe). detail = { channels: [{ title, url }] }. UserContext listens and
+ * swaps the whole app for the subscribe screen.
+ */
+export const SUBSCRIPTION_REQUIRED_EVENT = 'subscription-required';
 
 const TIMEOUT_MS = 15000;
 
@@ -51,7 +59,14 @@ async function request(endpoint, { method = 'GET', body, form, timeout = TIMEOUT
     });
 
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new ApiError(data.code || 'server', data.message);
+    if (!res.ok) {
+      if (data.code === 'not_subscribed') {
+        const channels = Array.isArray(data.channels) ? data.channels : [];
+        window.dispatchEvent(new CustomEvent(SUBSCRIPTION_REQUIRED_EVENT, { detail: { channels } }));
+        throw new ApiError('not_subscribed', data.message, { channels });
+      }
+      throw new ApiError(data.code || 'server', data.message);
+    }
     return data;
   } catch (err) {
     if (err instanceof ApiError) throw err;
@@ -176,6 +191,16 @@ export const api = {
       name: user.name,
       username: user.username,
     };
+  },
+
+  /**
+   * Live force-subscribe check (the "Tekshirish" button).
+   * { subscribed: boolean, channels: [{ title, url }] } — channels still to join.
+   */
+  checkSubscription: async () => {
+    if (DEMO_MODE) return { subscribed: true, channels: [] };
+    const { subscribed, channels } = await request('/subscription', { method: 'POST' });
+    return { subscribed: Boolean(subscribed), channels: Array.isArray(channels) ? channels : [] };
   },
 
   /** Last 20 orders, newest first. */

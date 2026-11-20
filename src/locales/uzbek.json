@@ -276,7 +276,8 @@
     "NO_FREE_CARDS": "Hozircha to'lov uchun bo'sh karta yo'q. Iltimos, 5 daqiqadan keyin qayta urinib ko'ring yoki boshqa summa kiriting.",
     "payments_unavailable": "Avtomatik to'lov vaqtincha ishlamayapti. Keyinroq urinib ko'ring",
     "not_found": "To'lov topilmadi",
-    "order_not_found": "Buyurtma topilmadi"
+    "order_not_found": "Buyurtma topilmadi",
+    "not_subscribed": "Avval kanalimizga obuna bo'ling"
   },
   "common": {
     "back": "Orqaga",
@@ -290,5 +291,14 @@
     "optional": "ixtiyoriy",
     "guest": "Mehmon",
     "som": "so'm"
+  },
+  "subscribe": {
+    "title": "Kanalimizga obuna bo'ling",
+    "subtitle": "Ilovadan foydalanish uchun quyidagi kanallarga obuna bo'ling, so'ng \"Tekshirish\" tugmasini bosing.",
+    "join": "Obuna bo'lish",
+    "check": "Tekshirish",
+    "hint": "Obuna bo'lgach shu yerga qayting",
+    "success": "Tabriklaymiz! ✅",
+    "not_yet": "Siz hali barcha kanallarga obuna bo'lmadingiz! ❌"
   }
 }

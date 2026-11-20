@@ -4,6 +4,8 @@ import { useLanguage } from './contexts/LanguageContext';
 import { backButton } from './lib/telegram';
 import { useGoBack } from './components/layout/Header';
 import LanguageSelector from './components/LanguageSelector';
+import SubscribeGate from './components/SubscribeGate';
+import { useUser } from './contexts/UserContext';
 import BottomNav from './components/layout/BottomNav';
 import OrderPending from './components/order/OrderPending';
 import Home from './pages/Home';
@@ -66,8 +68,11 @@ function AppRoutes() {
 
 export default function App() {
   const { showLanguageSelector } = useLanguage();
+  const { subscription } = useUser();
 
   if (showLanguageSelector) return <LanguageSelector />;
+  // Force subscribe: nothing else is usable until the user joins the channels
+  if (subscription) return <SubscribeGate />;
 
   // HashRouter: works on static hosting without server rewrites
   return (
